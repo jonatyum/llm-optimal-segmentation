@@ -1,0 +1,12 @@
+[project]
+name = "llm-optimal-segmentation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.135.3",
+    "pytest>=9.0.3",
+    "spacy>=3.8.14",
+    "tiktoken>=0.12.0",
+]

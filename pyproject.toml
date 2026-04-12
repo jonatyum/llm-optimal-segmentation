@@ -13,5 +13,6 @@ dependencies = [
     "pytest>=9.0.3",
     "sentence-transformers>=5.4.0",
     "spacy>=3.8.14",
+    "streamlit>=1.56.0",
     "tiktoken>=0.12.0",
 ]

@@ -24,6 +24,7 @@ with st.sidebar:
     overlap = st.slider("Overlap (sliding window)", 0, 100, 20, step=5)
     coherence_lambda = st.slider("λ coherencia", 0.0, 2.0, 0.5, step=0.1)
     overlap_mu = st.slider("μ overlap", 0.0, 2.0, 0.3, step=0.1)
+    fixed_cost = st.slider("Costo fijo por segmento", 0.0, 2000.0, 500.0, step=50.0)
     model = st.selectbox("Modelo de tokens", ["gpt-4o", "gpt-4", "gpt-3.5-turbo"])
 
 # ── Input ─────────────────────────────────────────────────────────────────────
@@ -155,6 +156,46 @@ if st.button("Segmentar", type="primary"):
     base_m = compute_metrics(base_result)
     sw_m = compute_metrics(sw_result)
 
+    # ── Curva en U — costo por número de segmentos ────────────────────────────
+    st.subheader("Curva de costo por número de segmentos (DP 2D)")
+
+    with st.spinner("Calculando DP 2D..."):
+        try:
+            from src.segmentation.dp import segment_dp_2d
+
+            dp2d_result = segment_dp_2d(
+                text, lmin=lmin, lmax=lmax, model=model,
+                coherence_lambda=coherence_lambda,
+                fixed_cost=fixed_cost
+            )
+
+            k_values = list(dp2d_result.cost_by_k.keys())
+            cost_values = list(dp2d_result.cost_by_k.values())
+            best_k = dp2d_result.num_segments
+
+            fig2, ax = plt.subplots(figsize=(10, 4))
+            ax.plot(k_values, cost_values, marker="o", color="#378ADD", linewidth=2)
+            ax.axvline(x=best_k, color="red", linestyle="--", linewidth=1.5, label=f"k óptimo = {best_k}")
+            ax.scatter([best_k], [dp2d_result.total_cost], color="red", zorder=5, s=100)
+            ax.set_title("Costo total vs número de segmentos k")
+            ax.set_xlabel("k (número de segmentos)")
+            ax.set_ylabel("Costo total (tokens²)")
+            ax.set_xticks(k_values)
+            ax.legend()
+            plt.tight_layout()
+            st.pyplot(fig2)
+
+            st.caption(f"k óptimo = {best_k} segmentos con costo {dp2d_result.total_cost:,.0f} tokens²")
+
+            with st.expander("Ver tabla completa de costos por k"):
+                st.table({
+                    "k (segmentos)": k_values,
+                    "Costo total (tokens²)": [f"{c:,.0f}" for c in cost_values],
+                    "Óptimo": ["✓" if k == best_k else "" for k in k_values],
+                })
+
+        except ValueError as e:
+            st.warning(f"DP 2D: {e}")
     st.table({
         "Método": ["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap"],
         "Segmentos": [dp_result.num_segments, base_result.num_segments, sw_result.num_segments, overlap_result.num_segments],

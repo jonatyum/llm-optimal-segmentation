@@ -1,4 +1,3 @@
-# tests/test_metrics.py
 import pytest
 from src.segmentation.dp import segment_dp
 from src.segmentation.baseline import segment_baseline

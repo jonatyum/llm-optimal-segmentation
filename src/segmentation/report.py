@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from src.segmentation.dp import segment_dp
+from src.segmentation.dp import segment_dp, segment_dp_2d, DP2DResult
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.overlap import segment_dp_overlap
 from src.segmentation.sliding_window import segment_sliding_window
 from src.segmentation.metrics import compute_metrics, compare
-from src.segmentation.evaluator import evaluate_segmentation, compare_evaluations
+from src.segmentation.evaluator import evaluate_segmentation
 
 
 @dataclass
@@ -15,6 +15,7 @@ class FullReport:
     baseline_metrics: dict
     overlap_metrics: dict
     sliding_window_metrics: dict
+    dp_2d_metrics: dict
     dp_vs_baseline: dict
     dp_vs_sliding_window: dict
 
@@ -27,6 +28,7 @@ def generate_full_report(
     model: str = "gpt-4o",
     coherence_lambda: float = 0.5,
     overlap_mu: float = 0.3,
+    fixed_cost: float = 1000.0,
     run_llm_evaluation: bool = False,
     llm_model: str = "gemma2:2b",
 ) -> FullReport:
@@ -40,14 +42,21 @@ def generate_full_report(
     dp_result = segment_dp(
         text, lmin=lmin, lmax=lmax, model=model,
         coherence_lambda=coherence_lambda,
+        fixed_cost=fixed_cost,
     )
     baseline_result = segment_baseline(text, lmax=lmax, model=model)
     overlap_result = segment_dp_overlap(
         text, lmin=lmin, lmax=lmax, model=model,
         coherence_lambda=coherence_lambda,
         overlap_mu=overlap_mu,
+        fixed_cost=fixed_cost,
     )
     sw_result = segment_sliding_window(text, lmax=lmax, overlap=overlap, model=model)
+    dp2d_result = segment_dp_2d(
+        text, lmin=lmin, lmax=lmax, model=model,
+        coherence_lambda=coherence_lambda,
+        fixed_cost=fixed_cost,
+    )
 
     # métricas estáticas
     dp_metrics = compute_metrics(dp_result)
@@ -63,7 +72,7 @@ def generate_full_report(
         "overlap_token_diff": sw_result.total_overlap_tokens - overlap_result.total_overlap_tokens,
     }
 
-    # métricas con LLM real (opcional, tarda más)
+    # métricas con LLM real (opcional)
     llm_dp = {}
     llm_baseline = {}
     llm_sw = {}
@@ -107,6 +116,19 @@ def generate_full_report(
             "total_cost": sw_result.total_cost,
             "total_overlap_tokens": sw_result.total_overlap_tokens,
             "llm_evaluation": llm_sw,
+        },
+        dp_2d_metrics={
+            "optimal_k": dp2d_result.num_segments,
+            "total_cost": dp2d_result.total_cost,
+            "cost_by_k": dp2d_result.cost_by_k,
+            "segments": [
+                {
+                    "index": s.index,
+                    "token_count": s.token_count,
+                    "num_sentences": len(s.sentences),
+                }
+                for s in dp2d_result.segments
+            ],
         },
         dp_vs_baseline={
             "cost_reduction_pct": dp_vs_baseline.cost_reduction_pct,

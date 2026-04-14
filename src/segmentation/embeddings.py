@@ -1,3 +1,12 @@
+import warnings
+warnings.filterwarnings("ignore")
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
+os.environ["HUGGINGFACE_HUB_VERBOSITY"] = "error"
+
 from sentence_transformers import SentenceTransformer
 import numpy as np
 

@@ -6,7 +6,7 @@ import numpy as np
 
 INF = float("inf")
 DEFAULT_LAMBDA = 0.5
-DEFAULT_FIXED_COST = 1000.0
+DEFAULT_FIXED_COST = 100.0
 
 
 def _compute_cost(

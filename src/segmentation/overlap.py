@@ -9,6 +9,7 @@ INF = float("inf")
 DEFAULT_LAMBDA = 0.5
 DEFAULT_MU = 0.3
 DEFAULT_MAX_OVERLAP = 3
+DEFAULT_FIXED_COST = 100.0
 
 
 @dataclass
@@ -37,6 +38,7 @@ def _compute_cost(
     end: int,
     coherence_lambda: float,
     overlap_mu: float,
+    fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> float:
     computational_cost = float(token_count ** 2)
 
@@ -56,6 +58,7 @@ def _compute_cost(
         computational_cost
         + coherence_lambda * coherence_penalty
         + overlap_mu * overlap_cost
+        + fixed_cost
     )
 
 
@@ -74,6 +77,7 @@ def segment_dp_overlap(
     coherence_lambda: float = DEFAULT_LAMBDA,
     overlap_mu: float = DEFAULT_MU,
     max_overlap: int = DEFAULT_MAX_OVERLAP,
+    fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> OverlapSegmentationResult:
     sentences = split_sentences(text)
     if not sentences:
@@ -108,6 +112,7 @@ def segment_dp_overlap(
                     end=j,
                     coherence_lambda=coherence_lambda,
                     overlap_mu=overlap_mu,
+                    fixed_cost=fixed_cost,
                 )
                 if cost < dp[j][o]:
                     dp[j][o] = cost

@@ -19,13 +19,49 @@ st.caption("Comparación visual de métodos de segmentación — Tesis UMSA 2025
 # ── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.header("Parámetros")
-    lmin = st.slider("Lmin (tokens mínimos)", 5, 100, 20, step=5)
-    lmax = st.slider("Lmax (tokens máximos)", 50, 400, 100, step=10)
-    overlap = st.slider("Overlap (sliding window)", 0, 100, 20, step=5)
-    coherence_lambda = st.slider("λ coherencia", 0.0, 2.0, 0.5, step=0.1)
-    overlap_mu = st.slider("μ overlap", 0.0, 2.0, 0.3, step=0.1)
-    fixed_cost = st.slider("Costo fijo por segmento", 0.0, 2000.0, 500.0, step=50.0)
-    model = st.selectbox("Modelo de tokens", ["gpt-4o", "gpt-4", "gpt-3.5-turbo"])
+    st.caption("Ajusta los parámetros para explorar el comportamiento del algoritmo")
+
+    lmin = st.slider(
+        "Lmin — tokens mínimos por segmento",
+        5, 100, 20, step=5,
+        help="Límite inferior de tokens por segmento. Evita segmentos demasiado pequeños que pierden contexto semántico."
+    )
+    lmax = st.slider(
+        "Lmax — tokens máximos por segmento",
+        50, 400, 100, step=10,
+        help="Límite superior de tokens por segmento. Representa la ventana de contexto disponible del LLM."
+    )
+    overlap = st.slider(
+        "Overlap — sliding window",
+        0, 100, 20, step=5,
+        help="Tokens de solapamiento entre ventanas consecutivas en el método Sliding Window tradicional."
+    )
+    coherence_lambda = st.slider(
+        "λ — peso de coherencia semántica",
+        0.0, 2.0, 0.5, step=0.1,
+        help="Controla cuánto penaliza el algoritmo los cortes que rompen unidades semánticas. λ=0 ignora coherencia, λ=2 la prioriza sobre eficiencia."
+    )
+    overlap_mu = st.slider(
+        "μ — peso del costo de overlap",
+        0.0, 2.0, 0.3, step=0.1,
+        help="Penaliza el overlap excesivo entre segmentos consecutivos. μ=0 ignora el overlap, valores altos lo minimizan."
+    )
+    fixed_cost = st.slider(
+        "Costo fijo por segmento",
+        0.0, 2000.0, 100.0, step=50.0,
+        help="Overhead fijo por cada llamada al LLM. Valores altos favorecen menos segmentos más grandes. Produce la curva en U en la DP 2D."
+    )
+    model = st.selectbox(
+        "Modelo de tokenización",
+        ["gpt-4o", "gpt-4", "gpt-3.5-turbo"],
+        help="Modelo cuyo tokenizador se usa para contar tokens. Afecta la distribución de tokens por segmento."
+    )
+
+    st.divider()
+    st.caption("**Guía rápida**")
+    st.caption("↑ lmax → más tokens por segmento")
+    st.caption("↑ λ → más coherencia semántica")
+    st.caption("↑ fixed_cost → curva en U más pronunciada")
 
 # ── Input ─────────────────────────────────────────────────────────────────────
 st.subheader("Texto de entrada")

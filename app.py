@@ -1,11 +1,12 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
-from src.segmentation.dp import segment_dp
+from src.segmentation.dp import segment_dp, segment_dp_2d
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.sliding_window import segment_sliding_window
 from src.segmentation.overlap import segment_dp_overlap
 from src.segmentation.metrics import compute_metrics, compare
+from src.segmentation.evaluator import evaluate_segmentation
 
 st.set_page_config(
     page_title="LLM Optimal Segmentation",
@@ -84,6 +85,7 @@ default_text = (
 )
 text = st.text_area("Ingresa el texto a segmentar", value=default_text, height=180)
 
+# ── Botón principal: solo segmentación ────────────────────────────────────────
 if st.button("Segmentar", type="primary"):
     with st.spinner("Calculando segmentaciones..."):
         try:
@@ -95,6 +97,24 @@ if st.button("Segmentar", type="primary"):
         except ValueError as e:
             st.error(f"Error: {e}")
             st.stop()
+
+    # Guardar resultados en session_state para el botón LLM
+    st.session_state["dp_result"] = dp_result
+    st.session_state["base_result"] = base_result
+    st.session_state["sw_result"] = sw_result
+    st.session_state["overlap_result"] = overlap_result
+    st.session_state["report"] = report
+    st.session_state["text"] = text
+    st.session_state["llm_model"] = "gemma2:2b"
+    st.session_state.pop("llm_evaluation", None)  # resetear evaluación LLM anterior
+
+# ── Mostrar resultados si existen en session_state ────────────────────────────
+if "dp_result" in st.session_state:
+    dp_result = st.session_state["dp_result"]
+    base_result = st.session_state["base_result"]
+    sw_result = st.session_state["sw_result"]
+    overlap_result = st.session_state["overlap_result"]
+    report = st.session_state["report"]
 
     # ── Métricas resumen ──────────────────────────────────────────────────────
     st.subheader("Resumen de métricas")
@@ -197,8 +217,6 @@ if st.button("Segmentar", type="primary"):
 
     with st.spinner("Calculando DP 2D..."):
         try:
-            from src.segmentation.dp import segment_dp_2d
-
             dp2d_result = segment_dp_2d(
                 text, lmin=lmin, lmax=lmax, model=model,
                 coherence_lambda=coherence_lambda,
@@ -232,6 +250,7 @@ if st.button("Segmentar", type="primary"):
 
         except ValueError as e:
             st.warning(f"DP 2D: {e}")
+
     st.table({
         "Método": ["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap"],
         "Segmentos": [dp_result.num_segments, base_result.num_segments, sw_result.num_segments, overlap_result.num_segments],
@@ -240,3 +259,60 @@ if st.button("Segmentar", type="primary"):
         "Std tokens": [dp_m.std_tokens_per_segment, base_m.std_tokens_per_segment, sw_m.std_tokens_per_segment, "—"],
         "Coherencia": [dp_m.avg_coherence, base_m.avg_coherence, sw_m.avg_coherence, "—"],
     })
+
+    # ── Evaluación LLM — botón separado ──────────────────────────────────────
+    st.divider()
+    st.subheader("Evaluación con LLM real")
+    st.caption("Ejecuta inferencia local con Ollama. Requiere que `gemma2:2b` esté descargado.")
+
+    if st.button("Evaluar con LLM real (lento)", type="secondary"):
+        with st.spinner("Ejecutando inferencia con gemma2:2b..."):
+            try:
+                dp_segments = [s.text for s in dp_result.segments]
+                base_segments = [s.text for s in base_result.segments]
+                sw_segments = [s.text for s in sw_result.segments]
+
+                llm_dp = evaluate_segmentation(dp_segments, method="dp", model="gemma2:2b")
+                llm_base = evaluate_segmentation(base_segments, method="baseline", model="gemma2:2b")
+                llm_sw = evaluate_segmentation(sw_segments, method="sliding_window", model="gemma2:2b")
+
+                st.session_state["llm_evaluation"] = {
+                    "dp": llm_dp,
+                    "baseline": llm_base,
+                    "sliding_window": llm_sw,
+                }
+            except Exception as e:
+                st.error(f"Error al conectar con Ollama: {e}")
+
+    if "llm_evaluation" in st.session_state:
+        llm = st.session_state["llm_evaluation"]
+
+        st.subheader("Resultados de evaluación LLM")
+
+        def _llm_metric(eval_dict: dict, key: str, fmt: str = ".2f"):
+            val = eval_dict.get(key, None)
+            if val is None:
+                return "—"
+            try:
+                return format(float(val), fmt)
+            except (TypeError, ValueError):
+                return str(val)
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("**DP Optimal**")
+            st.metric("Latencia avg (ms)", _llm_metric(llm["dp"], "avg_latency_ms"))
+            st.metric("Tokens prompt avg", _llm_metric(llm["dp"], "avg_prompt_tokens", ".0f"))
+            st.metric("Coherencia LLM avg", _llm_metric(llm["dp"], "avg_coherence"))
+
+        with col2:
+            st.markdown("**Baseline**")
+            st.metric("Latencia avg (ms)", _llm_metric(llm["baseline"], "avg_latency_ms"))
+            st.metric("Tokens prompt avg", _llm_metric(llm["baseline"], "avg_prompt_tokens", ".0f"))
+            st.metric("Coherencia LLM avg", _llm_metric(llm["baseline"], "avg_coherence"))
+
+        with col3:
+            st.markdown("**Sliding Window**")
+            st.metric("Latencia avg (ms)", _llm_metric(llm["sliding_window"], "avg_latency_ms"))
+            st.metric("Tokens prompt avg", _llm_metric(llm["sliding_window"], "avg_prompt_tokens", ".0f"))
+            st.metric("Coherencia LLM avg", _llm_metric(llm["sliding_window"], "avg_coherence"))

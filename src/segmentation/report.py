@@ -16,6 +16,7 @@ class FullReport:
     overlap_metrics: dict
     sliding_window_metrics: dict
     dp_2d_metrics: dict
+    dp_2d_analytical: dict
     dp_vs_baseline: dict
     dp_vs_sliding_window: dict
 
@@ -34,6 +35,7 @@ def generate_full_report(
 ) -> FullReport:
     from src.segmentation.splitter import split_sentences
     from src.segmentation.tokenizer import count_tokens
+    from src.segmentation.calibration import estimate_optimal_k, validate_calibration
 
     sentences = split_sentences(text)
     total_tokens = count_tokens(text, model=model)
@@ -56,6 +58,15 @@ def generate_full_report(
         text, lmin=lmin, lmax=lmax, model=model,
         coherence_lambda=coherence_lambda,
         fixed_cost=fixed_cost,
+    )
+
+    # calibración analítica
+    k_analytical = estimate_optimal_k(text, model=model, fixed_cost=fixed_cost)
+    calibration = validate_calibration(
+        text, lmin=lmin, lmax=lmax,
+        coherence_lambda=coherence_lambda,
+        fixed_cost=fixed_cost,
+        model=model,
     )
 
     # métricas estáticas
@@ -121,6 +132,9 @@ def generate_full_report(
             "optimal_k": dp2d_result.num_segments,
             "total_cost": dp2d_result.total_cost,
             "cost_by_k": dp2d_result.cost_by_k,
+            "k_analytical": k_analytical,
+            "deviation_pct": calibration["deviation_pct"],
+            "calibration_valid": calibration["valid"],
             "segments": [
                 {
                     "index": s.index,
@@ -130,6 +144,7 @@ def generate_full_report(
                 for s in dp2d_result.segments
             ],
         },
+        dp_2d_analytical=calibration,
         dp_vs_baseline={
             "cost_reduction_pct": dp_vs_baseline.cost_reduction_pct,
             "coherence_improvement": dp_vs_baseline.coherence_improvement,

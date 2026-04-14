@@ -16,6 +16,9 @@ from src.segmentation import (
     compute_metrics,
     compare,
     generate_full_report,
+    suggest_lambda,
+    estimate_optimal_k,
+    validate_calibration,
 )
 
 
@@ -127,6 +130,43 @@ def cmd_report(args):
     print(f"Reducción costo DP vs Baseline:        {report.dp_vs_baseline['cost_reduction_pct']}%")
     print(f"Mejora coherencia DP vs Baseline:      {report.dp_vs_baseline['coherence_improvement']:+.4f}")
     print(f"Reducción costo DP vs Sliding Window:  {report.dp_vs_sliding_window['cost_reduction_pct']}%")
+    print_separator()
+    print(f"k* analítico:        {report.dp_2d_metrics['k_analytical']}")
+    print(f"k* DP 2D:            {report.dp_2d_metrics['optimal_k']}")
+    print(f"Desviación:          {report.dp_2d_metrics['deviation_pct']:.1%}")
+    print(f"Calibración válida:  {'Sí' if report.dp_2d_metrics['calibration_valid'] else 'No'}")
+
+
+def cmd_calibrate(args):
+    print_separator()
+    print("Calibración de parámetros")
+    print(f"lmin={args.lmin}, lmax={args.lmax}, fixed_cost={args.fixed_cost}")
+    print_separator()
+
+    lambda_sugerido = suggest_lambda(args.text)
+    print(f"λ sugerido (coherencia):  {lambda_sugerido}")
+
+    k_star = estimate_optimal_k(args.text, model=args.model, fixed_cost=args.fixed_cost)
+    print(f"k* analítico:             {k_star}")
+
+    print_separator()
+    print("Validando calibración con DP 2D...")
+    calibration = validate_calibration(
+        args.text,
+        lmin=args.lmin,
+        lmax=args.lmax,
+        coherence_lambda=lambda_sugerido,
+        fixed_cost=args.fixed_cost,
+        model=args.model,
+    )
+    print(f"k* DP 2D:                 {calibration['k_dp']}")
+    print(f"k* analítico:             {calibration['k_analytical']}")
+    print(f"Desviación:               {calibration['deviation_pct']:.1%}")
+    print(f"Calibración válida:       {'Sí ✓' if calibration['valid'] else 'No ✗'}")
+    print_separator()
+
+    if not calibration["valid"]:
+        print("Recomendación: ajusta fixed_cost o lmin/lmax para mejorar la calibración.")
 
 
 def main():
@@ -157,6 +197,13 @@ def main():
     rep_parser = subparsers.add_parser("report", help="Reporte completo de todos los métodos")
     rep_parser.add_argument("--llm", action="store_true", help="Incluir evaluación con LLM real")
 
+    # comando calibrate
+    cal_parser = subparsers.add_parser("calibrate", help="Calibrar parámetros óptimos para el texto")
+    cal_parser.add_argument(
+        "--llm-model", type=str, default="gemma2:2b",
+        help="Modelo Ollama para calibrar el costo fijo (requiere Ollama corriendo)"
+    )
+
     args = parser.parse_args()
 
     if args.command == "segment":
@@ -165,6 +212,8 @@ def main():
         cmd_compare(args)
     elif args.command == "report":
         cmd_report(args)
+    elif args.command == "calibrate":
+        cmd_calibrate(args)
     else:
         parser.print_help()
 

@@ -9,6 +9,12 @@ from src.segmentation.splitter import split_sentences
 from src.segmentation.evaluator import evaluate_segmentation, compare_evaluations
 from src.segmentation.report import generate_full_report, FullReport
 from src.segmentation.models import Segment, SegmentationResult
+from src.segmentation.calibration import (
+    suggest_lambda,
+    estimate_optimal_k,
+    calibrate_fixed_cost,
+    validate_calibration,
+)
 
 __all__ = [
     "segment_dp",
@@ -30,4 +36,8 @@ __all__ = [
     "FullReport",
     "Segment",
     "SegmentationResult",
+    "suggest_lambda",
+    "estimate_optimal_k",
+    "calibrate_fixed_cost",
+    "validate_calibration",
 ]

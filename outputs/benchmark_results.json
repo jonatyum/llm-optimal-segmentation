@@ -1,0 +1,738 @@
+{
+  "params": {
+    "lmin": 20,
+    "lmax": 150,
+    "overlap": 30,
+    "model": "gpt-4o",
+    "coherence_lambda": 0.5,
+    "overlap_mu": 0.3,
+    "fixed_cost": 1000.0
+  },
+  "corpus": [
+    {
+      "id": "llm_inference",
+      "title": "LLM Inference and Context Windows",
+      "domain": "LLM"
+    },
+    {
+      "id": "dynamic_programming",
+      "title": "Dynamic Programming and Optimal Substructure",
+      "domain": "Algorithms"
+    },
+    {
+      "id": "semantic_coherence",
+      "title": "Semantic Coherence and Text Embeddings",
+      "domain": "NLP"
+    },
+    {
+      "id": "transformer_architecture",
+      "title": "Transformer Architecture and Self-Attention",
+      "domain": "Deep Learning"
+    },
+    {
+      "id": "text_segmentation",
+      "title": "Text Segmentation Methods",
+      "domain": "NLP"
+    },
+    {
+      "id": "information_retrieval",
+      "title": "Information Retrieval and Vector Search",
+      "domain": "IR"
+    },
+    {
+      "id": "software_engineering",
+      "title": "Software Engineering Practices",
+      "domain": "Software Engineering"
+    },
+    {
+      "id": "optimization_methods",
+      "title": "Gradient-Based Optimization",
+      "domain": "Machine Learning"
+    },
+    {
+      "id": "computational_complexity",
+      "title": "Computational Complexity Theory",
+      "domain": "Algorithms"
+    },
+    {
+      "id": "natural_language_processing",
+      "title": "Natural Language Processing Pipelines",
+      "domain": "NLP"
+    }
+  ],
+  "results": [
+    {
+      "total_tokens": 254,
+      "dp": {
+        "num_segments": 8,
+        "total_cost": 16520.640638887882,
+        "avg_tokens": 32.0,
+        "std_tokens": 6.4,
+        "avg_coherence": 0.8398,
+        "token_counts": [
+          37,
+          26,
+          35,
+          23,
+          27,
+          34,
+          44,
+          30
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 33568,
+        "avg_tokens": 128.0,
+        "std_tokens": 20.0,
+        "avg_coherence": 0.4199,
+        "token_counts": [
+          148,
+          108
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 41029,
+        "total_overlap_tokens": 39
+      },
+      "dp_overlap": {
+        "num_segments": 8,
+        "total_cost": 16520.640638887882,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 8,
+        "total_cost": 16520.640638887882,
+        "cost_by_k": {
+          "2": 34866.58242922649,
+          "3": 25136.925203760467,
+          "4": 20531.185506001115,
+          "5": 18551.484893351793,
+          "6": 17583.310214966536,
+          "7": 16763.009574577212,
+          "8": 16520.640638887882
+        }
+      },
+      "calibration": {
+        "k_dp": 8,
+        "k_analytical": 8,
+        "deviation_pct": 0.0,
+        "valid": true
+      },
+      "k_analytical": 8,
+      "reductions": {
+        "dp_vs_baseline_pct": 50.78,
+        "dp_vs_sliding_window_pct": 59.73,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 277,
+      "dp": {
+        "num_segments": 8,
+        "total_cost": 18849.293143376708,
+        "avg_tokens": 34.62,
+        "std_tokens": 12.54,
+        "avg_coherence": 0.9267,
+        "token_counts": [
+          20,
+          34,
+          26,
+          64,
+          29,
+          40,
+          28,
+          36
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 38425,
+        "avg_tokens": 138.5,
+        "std_tokens": 5.5,
+        "avg_coherence": 0.3932,
+        "token_counts": [
+          144,
+          133
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 4,
+        "total_cost": 43817,
+        "total_overlap_tokens": 77
+      },
+      "dp_overlap": {
+        "num_segments": 8,
+        "total_cost": 18849.293143376708,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 8,
+        "total_cost": 18849.293143376708,
+        "cost_by_k": {
+          "2": 40425.60677017768,
+          "3": 28865.9545009012,
+          "4": 23353.853894874454,
+          "5": 21509.97463747859,
+          "6": 19701.950403556228,
+          "7": 19209.54497767985,
+          "8": 18849.293143376708
+        }
+      },
+      "calibration": {
+        "k_dp": 8,
+        "k_analytical": 9,
+        "deviation_pct": 0.1111,
+        "valid": true
+      },
+      "k_analytical": 9,
+      "reductions": {
+        "dp_vs_baseline_pct": 50.95,
+        "dp_vs_sliding_window_pct": 56.98,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 255,
+      "dp": {
+        "num_segments": 9,
+        "total_cost": 16599.513491138816,
+        "avg_tokens": 28.56,
+        "std_tokens": 5.38,
+        "avg_coherence": 0.8859,
+        "token_counts": [
+          23,
+          30,
+          40,
+          22,
+          30,
+          23,
+          33,
+          28,
+          28
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 33569,
+        "avg_tokens": 128.5,
+        "std_tokens": 16.5,
+        "avg_coherence": 0.5597,
+        "token_counts": [
+          145,
+          112
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 41973,
+        "total_overlap_tokens": 50
+      },
+      "dp_overlap": {
+        "num_segments": 9,
+        "total_cost": 16599.513491138816,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 9,
+        "total_cost": 16599.513491138816,
+        "cost_by_k": {
+          "2": 35389.43876824826,
+          "3": 25195.81613196308,
+          "4": 20735.859858237207,
+          "5": 18386.251210033894,
+          "6": 17428.14227797836,
+          "7": 16977.69668266177,
+          "8": 16727.575977265835,
+          "9": 16599.513491138816
+        }
+      },
+      "calibration": {
+        "k_dp": 9,
+        "k_analytical": 8,
+        "deviation_pct": 0.125,
+        "valid": true
+      },
+      "k_analytical": 8,
+      "reductions": {
+        "dp_vs_baseline_pct": 50.55,
+        "dp_vs_sliding_window_pct": 60.45,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 269,
+      "dp": {
+        "num_segments": 8,
+        "total_cost": 17309.61752963066,
+        "avg_tokens": 33.62,
+        "std_tokens": 5.74,
+        "avg_coherence": 0.8456,
+        "token_counts": [
+          31,
+          27,
+          38,
+          35,
+          27,
+          29,
+          38,
+          44
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 36205,
+        "avg_tokens": 134.5,
+        "std_tokens": 3.5,
+        "avg_coherence": 0.3385,
+        "token_counts": [
+          131,
+          138
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 36734,
+        "total_overlap_tokens": 21
+      },
+      "dp_overlap": {
+        "num_segments": 8,
+        "total_cost": 17309.61752963066,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 8,
+        "total_cost": 17309.61752963066,
+        "cost_by_k": {
+          "2": 38205.66154013673,
+          "3": 27221.99294255674,
+          "4": 22248.330645143986,
+          "5": 19994.370891340077,
+          "6": 18550.2637155205,
+          "7": 17875.9020370543,
+          "8": 17309.61752963066,
+          "9": 17343.290545076132
+        }
+      },
+      "calibration": {
+        "k_dp": 8,
+        "k_analytical": 9,
+        "deviation_pct": 0.1111,
+        "valid": true
+      },
+      "k_analytical": 9,
+      "reductions": {
+        "dp_vs_baseline_pct": 52.19,
+        "dp_vs_sliding_window_pct": 52.88,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 267,
+      "dp": {
+        "num_segments": 9,
+        "total_cost": 17247.823718234897,
+        "avg_tokens": 29.67,
+        "std_tokens": 6.02,
+        "avg_coherence": 0.817,
+        "token_counts": [
+          21,
+          41,
+          24,
+          29,
+          29,
+          37,
+          28,
+          33,
+          25
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 35865,
+        "avg_tokens": 133.5,
+        "std_tokens": 10.5,
+        "avg_coherence": 0.3687,
+        "token_counts": [
+          144,
+          123
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 40229,
+        "total_overlap_tokens": 57
+      },
+      "dp_overlap": {
+        "num_segments": 9,
+        "total_cost": 17247.823718234897,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 9,
+        "total_cost": 17247.823718234897,
+        "cost_by_k": {
+          "2": 37865.631343886256,
+          "3": 26817.95693701754,
+          "4": 22158.17115387817,
+          "5": 19454.53281024471,
+          "6": 18732.321798775345,
+          "7": 18022.39891628176,
+          "8": 17630.142116852105,
+          "9": 17247.823718234897
+        }
+      },
+      "calibration": {
+        "k_dp": 9,
+        "k_analytical": 8,
+        "deviation_pct": 0.125,
+        "valid": true
+      },
+      "k_analytical": 8,
+      "reductions": {
+        "dp_vs_baseline_pct": 51.91,
+        "dp_vs_sliding_window_pct": 57.13,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 315,
+      "dp": {
+        "num_segments": 9,
+        "total_cost": 21177.86618744582,
+        "avg_tokens": 35.22,
+        "std_tokens": 10.6,
+        "avg_coherence": 0.8075,
+        "token_counts": [
+          59,
+          30,
+          45,
+          36,
+          27,
+          28,
+          36,
+          35,
+          21
+        ]
+      },
+      "baseline": {
+        "num_segments": 3,
+        "total_cost": 37221,
+        "avg_tokens": 105.67,
+        "std_tokens": 35.24,
+        "avg_coherence": 0.5322,
+        "token_counts": [
+          134,
+          127,
+          56
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 47445,
+        "total_overlap_tokens": 55
+      },
+      "dp_overlap": {
+        "num_segments": 9,
+        "total_cost": 21177.86618744582,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 9,
+        "total_cost": 21177.86618744582,
+        "cost_by_k": {
+          "3": 36801.804342343785,
+          "4": 29705.983899518847,
+          "5": 25308.175817575306,
+          "6": 23104.339575778693,
+          "7": 22160.357543595135,
+          "8": 21648.08459534496,
+          "9": 21177.86618744582
+        }
+      },
+      "calibration": {
+        "k_dp": 9,
+        "k_analytical": 10,
+        "deviation_pct": 0.1,
+        "valid": true
+      },
+      "k_analytical": 10,
+      "reductions": {
+        "dp_vs_baseline_pct": 43.1,
+        "dp_vs_sliding_window_pct": 55.36,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 289,
+      "dp": {
+        "num_segments": 11,
+        "total_cost": 18891.263134866953,
+        "avg_tokens": 26.27,
+        "std_tokens": 5.21,
+        "avg_coherence": 0.9522,
+        "token_counts": [
+          23,
+          36,
+          25,
+          25,
+          26,
+          24,
+          22,
+          24,
+          22,
+          38,
+          24
+        ]
+      },
+      "baseline": {
+        "num_segments": 3,
+        "total_cost": 35701,
+        "avg_tokens": 96.33,
+        "std_tokens": 51.19,
+        "avg_coherence": 0.5493,
+        "token_counts": [
+          135,
+          130,
+          24
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 4,
+        "total_cost": 41141,
+        "total_overlap_tokens": 67
+      },
+      "dp_overlap": {
+        "num_segments": 11,
+        "total_cost": 18891.263134866953,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 11,
+        "total_cost": 18891.263134866953,
+        "cost_by_k": {
+          "3": 31130.03108870983,
+          "4": 25150.440491512418,
+          "5": 21950.661917246878,
+          "6": 20135.075938373804,
+          "7": 19478.769873335958,
+          "8": 19228.45493800938,
+          "9": 18979.99729694426,
+          "10": 18923.763584509492,
+          "11": 18891.263134866953
+        }
+      },
+      "calibration": {
+        "k_dp": 11,
+        "k_analytical": 9,
+        "deviation_pct": 0.2222,
+        "valid": false
+      },
+      "k_analytical": 9,
+      "reductions": {
+        "dp_vs_baseline_pct": 47.08,
+        "dp_vs_sliding_window_pct": 54.08,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 156,
+      "dp": {
+        "num_segments": 6,
+        "total_cost": 10238.223643243313,
+        "avg_tokens": 26.0,
+        "std_tokens": 5.51,
+        "avg_coherence": 0.9255,
+        "token_counts": [
+          36,
+          29,
+          20,
+          25,
+          26,
+          20
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 18896,
+        "avg_tokens": 78.0,
+        "std_tokens": 58.0,
+        "avg_coherence": 0.7144,
+        "token_counts": [
+          136,
+          20
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 21012,
+        "total_overlap_tokens": 51
+      },
+      "dp_overlap": {
+        "num_segments": 6,
+        "total_cost": 10238.223643243313,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 6,
+        "total_cost": 10238.223643243313,
+        "cost_by_k": {
+          "2": 14266.586305434506,
+          "3": 11366.875405073166,
+          "4": 10278.86298173666,
+          "5": 10238.534077987075,
+          "6": 10238.223643243313
+        }
+      },
+      "calibration": {
+        "k_dp": 6,
+        "k_analytical": 5,
+        "deviation_pct": 0.2,
+        "valid": true
+      },
+      "k_analytical": 5,
+      "reductions": {
+        "dp_vs_baseline_pct": 45.82,
+        "dp_vs_sliding_window_pct": 51.27,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 166,
+      "dp": {
+        "num_segments": 5,
+        "total_cost": 10682.6899985224,
+        "avg_tokens": 33.2,
+        "std_tokens": 5.84,
+        "avg_coherence": 0.724,
+        "token_counts": [
+          30,
+          25,
+          37,
+          32,
+          42
+        ]
+      },
+      "baseline": {
+        "num_segments": 2,
+        "total_cost": 20506,
+        "avg_tokens": 83.0,
+        "std_tokens": 58.0,
+        "avg_coherence": 0.7967,
+        "token_counts": [
+          141,
+          25
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 2,
+        "total_cost": 25357,
+        "total_overlap_tokens": 16
+      },
+      "dp_overlap": {
+        "num_segments": 5,
+        "total_cost": 10682.6899985224,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 5,
+        "total_cost": 10682.6899985224,
+        "cost_by_k": {
+          "2": 15876.44286521276,
+          "3": 12550.664823770523,
+          "4": 11084.946368739009,
+          "5": 10682.6899985224
+        }
+      },
+      "calibration": {
+        "k_dp": 5,
+        "k_analytical": 5,
+        "deviation_pct": 0.0,
+        "valid": true
+      },
+      "k_analytical": 5,
+      "reductions": {
+        "dp_vs_baseline_pct": 47.9,
+        "dp_vs_sliding_window_pct": 57.87,
+        "dp_vs_overlap_pct": 0.0
+      }
+    },
+    {
+      "total_tokens": 332,
+      "dp": {
+        "num_segments": 10,
+        "total_cost": 21361.920151099563,
+        "avg_tokens": 33.3,
+        "std_tokens": 5.22,
+        "avg_coherence": 0.816,
+        "token_counts": [
+          30,
+          31,
+          36,
+          35,
+          28,
+          26,
+          41,
+          43,
+          30,
+          33
+        ]
+      },
+      "baseline": {
+        "num_segments": 3,
+        "total_cost": 40437,
+        "avg_tokens": 111.0,
+        "std_tokens": 34.03,
+        "avg_coherence": 0.4093,
+        "token_counts": [
+          132,
+          138,
+          63
+        ]
+      },
+      "sliding_window": {
+        "num_segments": 3,
+        "total_cost": 54658,
+        "total_overlap_tokens": 26
+      },
+      "dp_overlap": {
+        "num_segments": 10,
+        "total_cost": 21361.920151099563,
+        "total_overlap_tokens": 0
+      },
+      "dp_2d": {
+        "optimal_k": 10,
+        "total_cost": 21361.920151099563,
+        "cost_by_k": {
+          "3": 40545.8849885501,
+          "4": 32176.06911811729,
+          "5": 27524.324413518112,
+          "6": 25106.434014104307,
+          "7": 23586.12666925043,
+          "8": 22678.196290403605,
+          "9": 21818.192460253835,
+          "10": 21361.920151099563
+        }
+      },
+      "calibration": {
+        "k_dp": 10,
+        "k_analytical": 10,
+        "deviation_pct": 0.0,
+        "valid": true
+      },
+      "k_analytical": 10,
+      "reductions": {
+        "dp_vs_baseline_pct": 47.17,
+        "dp_vs_sliding_window_pct": 60.92,
+        "dp_vs_overlap_pct": 0.0
+      }
+    }
+  ],
+  "aggregates": {
+    "avg_dp_vs_baseline_pct": 48.74,
+    "avg_dp_vs_sw_pct": 56.67,
+    "avg_coherence_dp": 0.854,
+    "avg_coherence_baseline": 0.5082
+  }
+}

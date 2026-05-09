@@ -4,7 +4,7 @@ Sistema de segmentación óptima de textos para procesamiento con Modelos de Len
 
 El núcleo del sistema es un algoritmo de **Programación Dinámica (DP)** que garantiza la solución óptima global, a diferencia de enfoques greedy que solo aseguran óptimos locales. Se implementan además variantes como DP 2D (para encontrar el número óptimo de segmentos k\*), DP con solapamiento y ventana deslizante, para comparación exhaustiva. Un módulo de calibración estima parámetros óptimos analíticamente y valida la coherencia entre el k\* teórico y el k\* encontrado por DP.
 
-El proyecto incluye una interfaz web interactiva (Streamlit), una CLI completa y una API Python pública, todo respaldado por una suite de 113+ tests.
+El proyecto incluye una interfaz web interactiva (Streamlit), una CLI completa y una API Python pública, todo respaldado por una suite de 173+ tests.
 
 > **Tesis:** Universidad Mayor de San Andrés (UMSA) — 2025
 

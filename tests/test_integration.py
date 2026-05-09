@@ -26,7 +26,8 @@ TEXT = (
 
 
 def test_full_pipeline_dp_vs_baseline():
-    dp_result = segment_dp(TEXT, lmin=10, lmax=80)
+    # fixed_cost bajo para que el término cuadrático domine la comparación
+    dp_result = segment_dp(TEXT, lmin=10, lmax=80, fixed_cost=0.0)
     base_result = segment_baseline(TEXT, lmax=80)
     report = compare(dp_result, base_result)
     assert report.dp.total_cost < report.baseline.total_cost

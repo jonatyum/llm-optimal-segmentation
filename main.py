@@ -178,7 +178,7 @@ def main():
     parser.add_argument("--lmax", type=int, default=150, help="Tokens máximos por segmento")
     parser.add_argument("--overlap", type=int, default=20, help="Overlap para sliding window")
     parser.add_argument("--model", type=str, default="gpt-4o", help="Modelo de tokenización")
-    parser.add_argument("--fixed-cost", type=float, default=100.0, help="Costo fijo por segmento")
+    parser.add_argument("--fixed-cost", type=float, default=1000.0, help="Costo fijo por segmento")
 
     subparsers = parser.add_subparsers(dest="command")
 

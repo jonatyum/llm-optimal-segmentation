@@ -1,3 +1,4 @@
+# dp.py — algoritmo DP con función de costo compuesta
 from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
@@ -5,8 +6,8 @@ from src.segmentation.embeddings import get_embeddings, cosine_similarity
 import numpy as np
 
 INF = float("inf")
-DEFAULT_LAMBDA = 0.5
-DEFAULT_FIXED_COST = 100.0
+DEFAULT_LAMBDA = 0.5        # peso de coherencia semántica
+DEFAULT_FIXED_COST = 1000.0  # overhead fijo por llamada al LLM
 
 
 def _compute_cost(
@@ -17,8 +18,10 @@ def _compute_cost(
     coherence_lambda: float,
     fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> float:
+    # Componente 1: costo cuadrático de autoatención
     computational_cost = float(token_count ** 2)
 
+    # Componente 2: penalización de coherencia semántica
     if end - start < 2:
         coherence_penalty = 0.0
     else:
@@ -32,6 +35,7 @@ def _compute_cost(
     return computational_cost + coherence_lambda * coherence_penalty + fixed_cost
 
 
+# prefix sum — permite calcular tokens(i,j) en O(1)
 def _build_cumulative_tokens(token_lens: list[int]) -> list[int]:
     cumulative = [0]
     for t in token_lens:
@@ -56,11 +60,11 @@ def segment_dp(
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
 
-    dp = [INF] * (n + 1)
-    back = [-1] * (n + 1)
+    dp = [INF] * (n + 1)    # dp[j] = costo mínimo primeras j oraciones
+    back = [-1] * (n + 1)  # punteros para reconstrucción por backtracking
     dp[0] = 0.0
 
-    for j in range(1, n + 1):
+    for j in range(1, n + 1):  # O(n^2)
         for i in range(j):
             span = cumtok[j] - cumtok[i]
             if span < lmin or span > lmax:
@@ -143,7 +147,7 @@ def segment_dp_2d(
     if max_k is None:
         max_k = n
 
-    # dp[i][k] = costo minimo de segmentar las primeras i oraciones en exactamente k segmentos
+    # dp[j][k] = costo mínimo de segmentar j oraciones en exactamente k segmentos
     dp = [[INF] * (max_k + 1) for _ in range(n + 1)]
     back = [[(-1, -1)] * (max_k + 1) for _ in range(n + 1)]
     dp[0][0] = 0.0
@@ -168,7 +172,7 @@ def segment_dp_2d(
                     dp[j][k] = cost
                     back[j][k] = (i, k - 1)
 
-    # encontrar k optimo
+    # seleccionar k óptimo: argmin_k { dp[n][k] }
     cost_by_k = {}
     for k in range(1, max_k + 1):
         if dp[n][k] < INF:

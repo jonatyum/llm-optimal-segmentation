@@ -8,7 +8,7 @@ import numpy as np
 
 INF = float("inf")
 DEFAULT_LAMBDA = 0.5
-DEFAULT_MU = 0.3  # peso de penalización de overlap
+DEFAULT_MU = 0.03
 DEFAULT_MAX_OVERLAP = 3
 DEFAULT_FIXED_COST = 1000.0
 
@@ -37,14 +37,13 @@ def _compute_cost(
     embeddings: np.ndarray,
     start: int,
     end: int,
+    boundary: int,
     coherence_lambda: float,
     overlap_mu: float,
     fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> float:
-    # Componente 1: costo cuadrático de autoatención
     computational_cost = float(token_count ** 2)
 
-    # Componente 2: penalización de coherencia semántica
     if end - start < 2:
         coherence_penalty = 0.0
     else:
@@ -55,13 +54,17 @@ def _compute_cost(
         avg_coherence = float(np.mean(scores))
         coherence_penalty = 1.0 - avg_coherence
 
-    # Componente 3: penalización cuadrática de overlap
-    overlap_cost = float(overlap_tokens ** 2)
+    # Costo neto de overlap: penalidad lineal menos bonus por coherencia en el borde.
+    # overlap es beneficioso cuando boundary_sim > overlap_mu * overlap_tokens / lambda.
+    overlap_cost = 0.0
+    if overlap_tokens > 0 and boundary > 0:
+        boundary_sim = cosine_similarity(embeddings[boundary - 1], embeddings[boundary])
+        overlap_cost = overlap_mu * overlap_tokens - coherence_lambda * boundary_sim
 
     return (
         computational_cost
         + coherence_lambda * coherence_penalty
-        + overlap_mu * overlap_cost
+        + overlap_cost
         + fixed_cost
     )
 
@@ -114,6 +117,7 @@ def segment_dp_overlap(
                     embeddings=embeddings,
                     start=overlap_start,
                     end=j,
+                    boundary=i,
                     coherence_lambda=coherence_lambda,
                     overlap_mu=overlap_mu,
                     fixed_cost=fixed_cost,

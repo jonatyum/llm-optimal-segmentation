@@ -9,10 +9,19 @@ Parámetros canónicos del experimento (los mismos de la tesis):
     lmin=20, lmax=150, lambda=0.5, mu=0.03, Cf=1000, model=gpt-4o
 """
 
+import hashlib
 import subprocess
 import sys
 import os
 import json
+
+# FIX 13: seeds para reproducibilidad del backend torch/transformers
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+try:
+    import torch
+    torch.manual_seed(42)
+except ImportError:
+    pass
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,10 +38,18 @@ CANONICAL = dict(
 OUTPUT_JSON = os.path.join(ROOT, "outputs", "benchmark_results.json")
 OUTPUT_LMAX = os.path.join(ROOT, "outputs", "cost_vs_lmax.png")
 OUTPUT_TOKENS = os.path.join(ROOT, "outputs", "comparison_tokens.png")
+CORPUS_PATH = os.path.join(ROOT, "data", "corpus.json")
+
+
+def _corpus_hash(path: str) -> str:
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:16]
 
 
 def run():
     out_arg = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else OUTPUT_JSON
+
+    corpus_hash = _corpus_hash(CORPUS_PATH) if os.path.exists(CORPUS_PATH) else "N/A"
 
     cmd = [
         sys.executable,
@@ -52,7 +69,8 @@ def run():
     print("=" * 60)
     for k, v in CANONICAL.items():
         print(f"  {k:<20} {v}")
-    print(f"\nJSON → {out_arg}")
+    print(f"\nCorpus SHA-256 (16 hex): {corpus_hash}")
+    print(f"JSON → {out_arg}")
     print(f"Figuras → {OUTPUT_LMAX}")
     print(f"         {OUTPUT_TOKENS}")
     print("=" * 60 + "\n")

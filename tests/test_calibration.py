@@ -104,6 +104,21 @@ class TestEstimateOptimalK:
         result = estimate_optimal_k(MEDIUM_TEXT, model="gpt-4o", fixed_cost=100.0)
         assert result >= 1
 
+    def test_coherence_lambda_zero_matches_simple_formula(self):
+        """Con coherence_lambda=0 debe coincidir con la fórmula simple N/sqrt(Cf)."""
+        import numpy as np
+        from src.segmentation.tokenizer import count_tokens
+        n_tokens = count_tokens(MEDIUM_TEXT, model="gpt-4o")
+        expected = max(1, round(n_tokens / np.sqrt(100.0)))
+        result = estimate_optimal_k(MEDIUM_TEXT, fixed_cost=100.0, coherence_lambda=0.0)
+        assert result == expected
+
+    def test_coherence_lambda_positive_accepted(self):
+        """coherence_lambda > 0 debe funcionar sin errores y retornar int positivo."""
+        result = estimate_optimal_k(MEDIUM_TEXT, fixed_cost=100.0, coherence_lambda=0.5)
+        assert isinstance(result, int)
+        assert result >= 1
+
 
 # ── validate_calibration ─────────────────────────────────────────────────────
 
@@ -122,6 +137,7 @@ class TestValidateCalibration:
         assert "k_analytical" in result
         assert "deviation_pct" in result
         assert "valid" in result
+        assert "relative_suboptimality" in result
 
     def test_k_dp_is_positive_int(self):
         result = validate_calibration(
@@ -150,13 +166,24 @@ class TestValidateCalibration:
         )
         assert isinstance(result["valid"], bool)
 
-    def test_valid_consistent_with_deviation(self):
-        """valid debe ser True iff deviation_pct <= 0.20."""
+    def test_relative_suboptimality_is_float_or_none(self):
+        """relative_suboptimality es float (si k* ∈ cost_by_k) o None."""
         result = validate_calibration(
             MEDIUM_TEXT, lmin=10, lmax=200, coherence_lambda=0.5, fixed_cost=100.0
         )
-        expected_valid = result["deviation_pct"] <= 0.20
-        assert result["valid"] == expected_valid
+        sub = result["relative_suboptimality"]
+        assert sub is None or isinstance(sub, float)
+
+    def test_valid_consistent_with_suboptimality(self):
+        """valid debe ser True iff relative_suboptimality <= 0.05."""
+        result = validate_calibration(
+            MEDIUM_TEXT, lmin=10, lmax=200, coherence_lambda=0.5, fixed_cost=100.0
+        )
+        sub = result["relative_suboptimality"]
+        if sub is None:
+            assert result["valid"] is False
+        else:
+            assert result["valid"] == (sub <= 0.05)
 
 
 # ── calibrate_fixed_cost (con mock de Ollama) ─────────────────────────────────
@@ -227,7 +254,9 @@ class TestCalibrationEndToEnd:
 
     def test_pipeline_estimate_then_validate_consistent(self):
         """k_analytical de validate_calibration debe coincidir con estimate_optimal_k."""
-        k_direct = estimate_optimal_k(MEDIUM_TEXT, fixed_cost=1000.0)
+        k_direct = estimate_optimal_k(
+            MEDIUM_TEXT, fixed_cost=1000.0, coherence_lambda=0.5
+        )
         cal = validate_calibration(
             MEDIUM_TEXT, lmin=10, lmax=200,
             coherence_lambda=0.5, fixed_cost=1000.0,

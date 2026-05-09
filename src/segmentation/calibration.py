@@ -40,19 +40,38 @@ def suggest_lambda(text: str) -> float:
         return 0.8
 
 
-def estimate_optimal_k(text: str, model: str = "gpt-4o", fixed_cost: float = 1000.0) -> int:
-    """Estima el número óptimo de segmentos k* usando la fórmula analítica.
+def estimate_optimal_k(
+    text: str,
+    model: str = "gpt-4o",
+    fixed_cost: float = 1000.0,
+    coherence_lambda: float = 0.0,
+) -> int:
+    """Estima el número óptimo de segmentos k*.
 
-    k* = round(n_tokens / sqrt(fixed_cost))
+    Fórmula derivada minimizando:
+        total_cost(k) = N²/k * (1 + λ*(1-coh_avg)) + k*Cf
+    → k* = N * sqrt((1 + λ*(1-coh_avg)) / Cf)
 
-    Derivado de minimizar el costo cuadrático total:
-    k * (n/k)^2 + k * fixed_cost → mínimo en k = n / sqrt(fixed_cost)
+    Para λ=0 equivale a la fórmula anterior k* = N/sqrt(Cf).
     """
     n_tokens = count_tokens(text, model=model)
     if fixed_cost <= 0:
         return 1
-    k_star = round(n_tokens / np.sqrt(fixed_cost))
-    return max(1, k_star)
+
+    scaling = 1.0
+    if coherence_lambda > 0:
+        sentences = split_sentences(text)
+        if len(sentences) >= 2:
+            embeddings = get_embeddings(sentences)
+            sims = [
+                cosine_similarity(embeddings[k], embeddings[k + 1])
+                for k in range(len(embeddings) - 1)
+            ]
+            coh_avg = float(np.mean(sims))
+            scaling = 1.0 + coherence_lambda * (1.0 - coh_avg)
+
+    k_star = n_tokens * np.sqrt(scaling / fixed_cost)
+    return max(1, round(k_star))
 
 
 def calibrate_fixed_cost(llm_model: str = "gemma2:2b", num_trials: int = 5) -> float:
@@ -82,11 +101,16 @@ def validate_calibration(
     """Valida la calibración comparando el k* del DP 2D vs el k* analítico.
 
     Corre segment_dp_2d y compara con estimate_optimal_k.
+    Un k* analítico es válido si el costo en dp2d.cost_by_k[k*] está dentro
+    del 5% del costo óptimo — evita la comparación tautológica de solo verificar
+    si k_analytical ≈ k_dp en número de segmentos.
+
     Retorna:
-        k_dp          : k óptimo encontrado por DP 2D
-        k_analytical  : k* estimado analíticamente
-        deviation_pct : |k_dp - k_analytical| / k_analytical
-        valid         : deviation_pct <= 0.20
+        k_dp                  : k óptimo encontrado por DP 2D
+        k_analytical          : k* estimado analíticamente
+        deviation_pct         : |k_dp - k_analytical| / max(k_analytical, 1)
+        relative_suboptimality: (cost[k*] - cost[k_dp]) / cost[k_dp], o None si k* ∉ cost_by_k
+        valid                 : relative_suboptimality <= 0.05
     """
     from src.segmentation.dp import segment_dp_2d
 
@@ -99,13 +123,29 @@ def validate_calibration(
         fixed_cost=fixed_cost,
     )
     k_dp = dp2d_result.num_segments
-    k_analytical = estimate_optimal_k(text, model=model, fixed_cost=fixed_cost)
+    k_analytical = estimate_optimal_k(
+        text, model=model, fixed_cost=fixed_cost, coherence_lambda=coherence_lambda
+    )
 
     deviation_pct = abs(k_dp - k_analytical) / max(k_analytical, 1)
+
+    if k_analytical in dp2d_result.cost_by_k:
+        cost_at_k_star = dp2d_result.cost_by_k[k_analytical]
+        cost_optimal = dp2d_result.cost_by_k[k_dp]
+        relative_suboptimality = (cost_at_k_star - cost_optimal) / max(cost_optimal, 1e-9)
+        valid = relative_suboptimality <= 0.05
+    else:
+        relative_suboptimality = float("inf")
+        valid = False
 
     return {
         "k_dp": k_dp,
         "k_analytical": k_analytical,
         "deviation_pct": round(deviation_pct, 4),
-        "valid": deviation_pct <= 0.20,
+        "relative_suboptimality": (
+            round(relative_suboptimality, 4)
+            if relative_suboptimality != float("inf")
+            else None
+        ),
+        "valid": valid,
     }

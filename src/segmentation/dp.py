@@ -10,29 +10,51 @@ DEFAULT_LAMBDA = 0.5        # peso de coherencia semántica
 DEFAULT_FIXED_COST = 1000.0  # overhead fijo por llamada al LLM
 
 
+def _build_similarity_arrays(embeddings: np.ndarray) -> tuple[list[float], list[float]]:
+    """Retorna (sims, prefix_sims) donde sims[k] = cos(emb[k], emb[k+1]).
+
+    prefix_sims[k] = sum(sims[0..k-1]) — permite calcular media de coherencia
+    en O(1) usando _avg_coherence.
+    """
+    n = len(embeddings)
+    sims: list[float] = []
+    prefix_sims: list[float] = [0.0] * n
+    for k in range(n - 1):
+        s = cosine_similarity(embeddings[k], embeddings[k + 1])
+        sims.append(s)
+        prefix_sims[k + 1] = prefix_sims[k] + s
+    return sims, prefix_sims
+
+
+def _avg_coherence(prefix_sims: list[float], start: int, end: int) -> float:
+    """Coherencia promedio del rango [start, end) en O(1).
+
+    Cuenta pares (start, start+1), ..., (end-2, end-1) → n_pairs = end-start-1.
+    prefix_sims[k] acumula similitudes 0..k-1, por lo que la suma del rango es
+    prefix_sims[end-1] - prefix_sims[start].
+    """
+    n_pairs = end - start - 1
+    if n_pairs <= 0:
+        return 1.0
+    return (prefix_sims[end - 1] - prefix_sims[start]) / n_pairs
+
+
 def _compute_cost(
     token_count: int,
-    embeddings: np.ndarray,
+    prefix_sims: list[float],
     start: int,
     end: int,
     coherence_lambda: float,
     fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> float:
     # Componente 1: costo cuadrático de autoatención
-    computational_cost = float(token_count ** 2)
+    t2 = float(token_count ** 2)
 
-    # Componente 2: penalización de coherencia semántica
-    if end - start < 2:
-        coherence_penalty = 0.0
-    else:
-        scores = []
-        for i in range(start, end - 1):
-            score = cosine_similarity(embeddings[i], embeddings[i + 1])
-            scores.append(score)
-        avg_coherence = float(np.mean(scores))
-        coherence_penalty = (1.0 - avg_coherence)
+    # Componente 2: λ escala el t² — hace que el peso de coherencia sea proporcional al costo
+    avg_coh = _avg_coherence(prefix_sims, start, end)
+    coherence_factor = 1.0 + coherence_lambda * (1.0 - avg_coh)
 
-    return computational_cost + coherence_lambda * coherence_penalty + fixed_cost
+    return t2 * coherence_factor + fixed_cost
 
 
 # prefix sum — permite calcular tokens(i,j) en O(1)
@@ -59,6 +81,7 @@ def segment_dp(
     n = len(sentences)
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
+    _, prefix_sims = _build_similarity_arrays(embeddings)
 
     dp = [INF] * (n + 1)    # dp[j] = costo mínimo primeras j oraciones
     back = [-1] * (n + 1)  # punteros para reconstrucción por backtracking
@@ -67,11 +90,13 @@ def segment_dp(
     for j in range(1, n + 1):  # O(n^2)
         for i in range(j):
             span = cumtok[j] - cumtok[i]
-            if span < lmin or span > lmax:
+            if span > lmax:
                 continue
+            if span < lmin:
+                break  # al avanzar i hacia j el span solo decrece
             cost = dp[i] + _compute_cost(
                 token_count=span,
-                embeddings=embeddings,
+                prefix_sims=prefix_sims,
                 start=i,
                 end=j,
                 coherence_lambda=coherence_lambda,
@@ -143,6 +168,7 @@ def segment_dp_2d(
     n = len(sentences)
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
+    _, prefix_sims = _build_similarity_arrays(embeddings)
 
     if max_k is None:
         max_k = n
@@ -156,13 +182,15 @@ def segment_dp_2d(
         for j in range(k, n + 1):
             for i in range(k - 1, j):
                 span = cumtok[j] - cumtok[i]
-                if span < lmin or span > lmax:
+                if span > lmax:
                     continue
+                if span < lmin:
+                    break  # span solo decrece al aumentar i
                 if dp[i][k - 1] == INF:
                     continue
                 cost = dp[i][k - 1] + _compute_cost(
                     token_count=span,
-                    embeddings=embeddings,
+                    prefix_sims=prefix_sims,
                     start=i,
                     end=j,
                     coherence_lambda=coherence_lambda,
@@ -188,6 +216,11 @@ def segment_dp_2d(
     best_cost = cost_by_k[best_k]
 
     # backtracking desde dp[n][best_k]
+    if back[n][best_k] == (-1, -1):
+        raise ValueError(
+            f"Estado de backtracking inválido en k={best_k}. No se encontró segmentación válida."
+        )
+
     cuts = []
     cur = n
     cur_k = best_k

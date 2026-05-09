@@ -2,7 +2,12 @@ from src.segmentation.dp import segment_dp, segment_dp_2d, DP2DResult
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.overlap import segment_dp_overlap
 from src.segmentation.sliding_window import segment_sliding_window
-from src.segmentation.metrics import compute_metrics, compare
+from src.segmentation.metrics import (
+    compute_metrics,
+    compare,
+    recompute_full_cost,
+    compare_full_cost,
+)
 from src.segmentation.embeddings import segment_coherence, get_embeddings
 from src.segmentation.tokenizer import count_tokens, count_tokens_batch
 from src.segmentation.splitter import split_sentences
@@ -15,6 +20,11 @@ from src.segmentation.calibration import (
     calibrate_fixed_cost,
     validate_calibration,
 )
+from src.segmentation.segmentation_metrics import (
+    boundaries_from_result,
+    pk,
+    window_diff,
+)
 
 __all__ = [
     "segment_dp",
@@ -25,6 +35,8 @@ __all__ = [
     "segment_sliding_window",
     "compute_metrics",
     "compare",
+    "recompute_full_cost",
+    "compare_full_cost",
     "segment_coherence",
     "get_embeddings",
     "count_tokens",
@@ -40,4 +52,7 @@ __all__ = [
     "estimate_optimal_k",
     "calibrate_fixed_cost",
     "validate_calibration",
+    "boundaries_from_result",
+    "pk",
+    "window_diff",
 ]

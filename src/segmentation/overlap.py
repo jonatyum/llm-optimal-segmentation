@@ -4,6 +4,7 @@ from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
 from src.segmentation.embeddings import get_embeddings, cosine_similarity
+from src.segmentation.dp import _build_similarity_arrays, _avg_coherence
 import numpy as np
 
 INF = float("inf")
@@ -34,7 +35,8 @@ class OverlapSegmentationResult:
 def _compute_cost(
     token_count: int,
     overlap_tokens: int,
-    embeddings: np.ndarray,
+    sims: list[float],
+    prefix_sims: list[float],
     start: int,
     end: int,
     boundary: int,
@@ -42,31 +44,19 @@ def _compute_cost(
     overlap_mu: float,
     fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> float:
-    computational_cost = float(token_count ** 2)
+    t2 = float(token_count ** 2)
 
-    if end - start < 2:
-        coherence_penalty = 0.0
-    else:
-        scores = []
-        for i in range(start, end - 1):
-            score = cosine_similarity(embeddings[i], embeddings[i + 1])
-            scores.append(score)
-        avg_coherence = float(np.mean(scores))
-        coherence_penalty = 1.0 - avg_coherence
+    avg_coh = _avg_coherence(prefix_sims, start, end)
+    coherence_factor = 1.0 + coherence_lambda * (1.0 - avg_coh)
 
     # Costo neto de overlap: penalidad lineal menos bonus por coherencia en el borde.
-    # overlap es beneficioso cuando boundary_sim > overlap_mu * overlap_tokens / lambda.
+    # boundary_sim usa sims[boundary-1] = cos(emb[boundary-1], emb[boundary])
     overlap_cost = 0.0
-    if overlap_tokens > 0 and boundary > 0:
-        boundary_sim = cosine_similarity(embeddings[boundary - 1], embeddings[boundary])
+    if overlap_tokens > 0 and boundary > 0 and boundary - 1 < len(sims):
+        boundary_sim = sims[boundary - 1]
         overlap_cost = overlap_mu * overlap_tokens - coherence_lambda * boundary_sim
 
-    return (
-        computational_cost
-        + coherence_lambda * coherence_penalty
-        + overlap_cost
-        + fixed_cost
-    )
+    return t2 * coherence_factor + overlap_cost + fixed_cost
 
 
 def _build_cumulative_tokens(token_lens: list[int]) -> list[int]:
@@ -94,37 +84,42 @@ def segment_dp_overlap(
     n = len(sentences)
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
+    sims, prefix_sims = _build_similarity_arrays(embeddings)
 
     # dp[j][o] = costo mínimo llegando a oración j con o oraciones de overlap
     dp = [[INF] * (max_overlap + 1) for _ in range(n + 1)]
-    back = [[(-1, 0)] * (max_overlap + 1) for _ in range(n + 1)]
+    back = [[(-1, -1)] * (max_overlap + 1) for _ in range(n + 1)]
     dp[0][0] = 0.0
 
     for j in range(1, n + 1):
         for i in range(j):
             span = cumtok[j] - cumtok[i]
-            if span < lmin or span > lmax:
+            if span > lmax:
                 continue
+            if span < lmin:
+                break  # span decrece al crecer i
             for o in range(max_overlap + 1):
                 overlap_start = max(0, i - o)
                 overlap_tokens = cumtok[i] - cumtok[overlap_start]
-                prev_o = 0
-                if dp[i][prev_o] == INF:
-                    continue
-                cost = dp[i][prev_o] + _compute_cost(
-                    token_count=span,
-                    overlap_tokens=overlap_tokens,
-                    embeddings=embeddings,
-                    start=overlap_start,
-                    end=j,
-                    boundary=i,
-                    coherence_lambda=coherence_lambda,
-                    overlap_mu=overlap_mu,
-                    fixed_cost=fixed_cost,
-                )
-                if cost < dp[j][o]:
-                    dp[j][o] = cost
-                    back[j][o] = (i, o)
+                # FIX 1: iterar sobre todos los prev_o válidos en dp[i]
+                for prev_o in range(max_overlap + 1):
+                    if dp[i][prev_o] == INF:
+                        continue
+                    cost = dp[i][prev_o] + _compute_cost(
+                        token_count=span,
+                        overlap_tokens=overlap_tokens,
+                        sims=sims,
+                        prefix_sims=prefix_sims,
+                        start=overlap_start,
+                        end=j,
+                        boundary=i,
+                        coherence_lambda=coherence_lambda,
+                        overlap_mu=overlap_mu,
+                        fixed_cost=fixed_cost,
+                    )
+                    if cost < dp[j][o]:
+                        dp[j][o] = cost
+                        back[j][o] = (i, prev_o)  # guardar prev_o real
 
     # seleccionar overlap óptimo para dp[n]
     best_cost = INF

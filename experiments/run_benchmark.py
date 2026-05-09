@@ -23,6 +23,7 @@ os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
+import scipy.stats
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -31,7 +32,7 @@ from src.segmentation.dp import segment_dp, segment_dp_2d
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.sliding_window import segment_sliding_window
 from src.segmentation.overlap import segment_dp_overlap
-from src.segmentation.metrics import compute_metrics
+from src.segmentation.metrics import compute_metrics, recompute_full_cost
 from src.segmentation.calibration import estimate_optimal_k, validate_calibration
 from src.segmentation.tokenizer import count_tokens
 
@@ -82,7 +83,17 @@ def run_one(
     m_sw = compute_metrics(sw)
     m_ov = compute_metrics(ov)
 
-    k_star = estimate_optimal_k(text, model=model, fixed_cost=fixed_cost)
+    # FIX 12: usar recompute_full_cost para comparación justa con la misma función de costo
+    dp_full_cost = recompute_full_cost(
+        dp, coherence_lambda=coherence_lambda, fixed_cost=fixed_cost, model=model
+    )
+    base_full_cost = recompute_full_cost(
+        base, coherence_lambda=coherence_lambda, fixed_cost=fixed_cost, model=model
+    )
+
+    k_star = estimate_optimal_k(
+        text, model=model, fixed_cost=fixed_cost, coherence_lambda=coherence_lambda
+    )
     cal = validate_calibration(
         text, lmin=lmin, lmax=lmax,
         coherence_lambda=coherence_lambda,
@@ -97,6 +108,7 @@ def run_one(
         "dp": {
             "num_segments": m_dp.num_segments,
             "total_cost": m_dp.total_cost,
+            "full_cost": dp_full_cost,
             "avg_tokens": m_dp.avg_tokens_per_segment,
             "std_tokens": m_dp.std_tokens_per_segment,
             "avg_coherence": m_dp.avg_coherence,
@@ -105,6 +117,7 @@ def run_one(
         "baseline": {
             "num_segments": m_base.num_segments,
             "total_cost": m_base.total_cost,
+            "full_cost": base_full_cost,
             "avg_tokens": m_base.avg_tokens_per_segment,
             "std_tokens": m_base.std_tokens_per_segment,
             "avg_coherence": m_base.avg_coherence,
@@ -129,9 +142,41 @@ def run_one(
         "k_analytical": k_star,
         "reductions": {
             "dp_vs_baseline_pct": pct(m_dp.total_cost, m_base.total_cost),
+            "dp_vs_baseline_full_pct": pct(dp_full_cost, base_full_cost),
             "dp_vs_sliding_window_pct": pct(m_dp.total_cost, sw.total_cost),
             "dp_vs_overlap_pct": pct(m_dp.total_cost, m_ov.total_cost),
         },
+    }
+
+
+def _compute_statistics(results: list[dict]) -> dict:
+    """IC95% y t-test pareado para la reducción de costo DP vs Baseline."""
+    dp_costs = np.array([r["dp"]["full_cost"] for r in results])
+    base_costs = np.array([r["baseline"]["full_cost"] for r in results])
+
+    if len(dp_costs) < 2:
+        return {}
+
+    reductions = (base_costs - dp_costs) / np.where(base_costs > 0, base_costs, 1.0) * 100
+
+    mean_red = float(np.mean(reductions))
+    n = len(reductions)
+
+    # IC95% via scipy.stats.t.interval
+    ci = scipy.stats.t.interval(
+        0.95, df=n - 1, loc=mean_red, scale=scipy.stats.sem(reductions)
+    )
+
+    # t-test pareado
+    t_stat, p_value = scipy.stats.ttest_rel(base_costs, dp_costs)
+
+    return {
+        "mean_reduction_pct": round(mean_red, 4),
+        "ci95_low": round(float(ci[0]), 4),
+        "ci95_high": round(float(ci[1]), 4),
+        "ttest_paired_t": round(float(t_stat), 6),
+        "ttest_paired_p": round(float(p_value), 6),
+        "n": n,
     }
 
 
@@ -170,14 +215,25 @@ def print_results(corpus: list[dict], results: list[dict]) -> None:
     print(f"Coherencia promedio Baseline:            {avg_coh_base:.4f}")
     print(f"Mejora coherencia DP vs Baseline:        {avg_coh_dp - avg_coh_base:+.4f}")
 
+    # FIX 12: IC95% y t-test pareado con función de costo completa
+    stats = _compute_statistics(results)
+    if stats:
+        print(sep)
+        print("Comparación justa (función de costo completa del DP):")
+        print(f"  Reducción media:  {stats['mean_reduction_pct']:.2f}%")
+        print(f"  IC95%:            [{stats['ci95_low']:.2f}%, {stats['ci95_high']:.2f}%]")
+        print(f"  t-test pareado:   t={stats['ttest_paired_t']:.4f}, p={stats['ttest_paired_p']:.4f}")
+
     print(sep)
     print("Calibración k*:")
     for doc, res in zip(corpus, results):
         cal = res["calibration"]
         valid = "✓" if cal["valid"] else "✗"
+        sub = cal.get("relative_suboptimality")
+        sub_str = f"  sub={sub:.4f}" if sub is not None else "  sub=N/A"
         print(
             f"  {doc['id']:<22} k_dp={cal['k_dp']:>2}  k*={cal['k_analytical']:>2}  "
-            f"dev={cal['deviation_pct']:.0%}  [{valid}]"
+            f"dev={cal['deviation_pct']:.0%}{sub_str}  [{valid}]"
         )
     print(sep)
 
@@ -344,6 +400,8 @@ def main():
     print()
     print_results(corpus, results)
 
+    stats = _compute_statistics(results)
+
     if args.save_json:
         out = {
             "params": {
@@ -364,6 +422,7 @@ def main():
                 "avg_coherence_baseline": round(
                     float(np.mean([r["baseline"]["avg_coherence"] for r in results])), 4),
             },
+            "statistics": stats,
         }
         os.makedirs(os.path.dirname(args.save_json), exist_ok=True)
         with open(args.save_json, "w", encoding="utf-8") as f:

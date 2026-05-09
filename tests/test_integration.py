@@ -8,6 +8,8 @@ from src.segmentation import (
     segment_sliding_window,
     compute_metrics,
     compare,
+    recompute_full_cost,
+    compare_full_cost,
     generate_full_report,
     FullReport,
 )
@@ -32,6 +34,32 @@ def test_full_pipeline_dp_vs_baseline():
     report = compare(dp_result, base_result)
     assert report.dp.total_cost < report.baseline.total_cost
     assert report.cost_reduction_pct > 0
+
+
+def test_full_pipeline_dp_vs_baseline_fair_cost():
+    """Comparación justa: ambas segmentaciones evaluadas con la misma función de costo."""
+    dp_result = segment_dp(TEXT, lmin=10, lmax=80, fixed_cost=0.0, coherence_lambda=0.5)
+    base_result = segment_baseline(TEXT, lmax=80)
+    comparison = compare_full_cost(
+        dp_result, base_result,
+        coherence_lambda=0.5, fixed_cost=0.0,
+    )
+    assert comparison["dp_cost"] > 0
+    assert comparison["other_cost"] > 0
+    assert isinstance(comparison["cost_reduction_pct"], float)
+
+
+def test_recompute_full_cost_is_consistent():
+    """recompute_full_cost con los mismos parámetros del DP debe dar un costo similar al DP."""
+    cf = 500.0
+    lam = 0.3
+    dp_result = segment_dp(TEXT, lmin=10, lmax=80, fixed_cost=cf, coherence_lambda=lam)
+    recomputed = recompute_full_cost(dp_result, coherence_lambda=lam, fixed_cost=cf)
+    # El costo recomputado puede diferir levemente por la reconstrucción de prefix_sims,
+    # pero debe ser positivo y de orden de magnitud similar
+    assert recomputed > 0
+    ratio = abs(recomputed - dp_result.total_cost) / max(dp_result.total_cost, 1.0)
+    assert ratio < 0.01  # tolerancia del 1%
 
 
 def test_full_pipeline_dp_vs_sliding_window():
@@ -90,3 +118,10 @@ def test_all_methods_produce_valid_segments():
             assert seg.token_count > 0
             assert len(seg.sentences) > 0
             assert len(seg.text) > 0
+
+
+def test_baseline_with_lmin_parameter():
+    """segment_baseline acepta lmin como parámetro sin romper la API."""
+    result = segment_baseline(TEXT, lmax=80, lmin=10)
+    assert result.num_segments > 0
+    assert result.total_cost > 0

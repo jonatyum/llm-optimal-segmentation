@@ -8,6 +8,7 @@ def segment_baseline(
     text: str,
     lmax: int = 200,
     model: str = "gpt-4o",
+    lmin: int = 0,
 ) -> SegmentationResult:
     sentences = split_sentences(text)
     if not sentences:
@@ -43,6 +44,18 @@ def segment_baseline(
             text=" ".join(current_sentences),
             token_count=current_tokens,
         ))
+
+    # FIX 4: si el último segmento tiene menos de lmin tokens, fusionarlo con el anterior
+    if lmin > 0 and len(segments) > 1 and segments[-1].token_count < lmin:
+        last = segments.pop()
+        prev = segments[-1]
+        merged = Segment(
+            index=prev.index,
+            sentences=prev.sentences + last.sentences,
+            text=" ".join(prev.sentences + last.sentences),
+            token_count=prev.token_count + last.token_count,
+        )
+        segments[-1] = merged
 
     # costo total = suma de tokens² de cada segmento
     total_cost = sum(s.token_count ** 2 for s in segments)

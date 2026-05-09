@@ -312,7 +312,7 @@ def main():
     parser.add_argument("--model", type=str, default="gpt-4o")
     parser.add_argument("--lambda", dest="coherence_lambda", type=float, default=0.5)
     parser.add_argument("--mu", type=float, default=0.3)
-    parser.add_argument("--fixed-cost", type=float, default=100.0)
+    parser.add_argument("--fixed-cost", type=float, default=1000.0)
     parser.add_argument("--save-json", type=str, default=None,
                         help="Ruta para guardar resultados en JSON")
     parser.add_argument("--no-plots", action="store_true",

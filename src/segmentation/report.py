@@ -11,6 +11,7 @@ from src.segmentation.evaluator import evaluate_segmentation
 class FullReport:
     text_length_tokens: int
     num_sentences: int
+    suggested_lambda: float
     dp_metrics: dict
     baseline_metrics: dict
     overlap_metrics: dict
@@ -35,10 +36,11 @@ def generate_full_report(
 ) -> FullReport:
     from src.segmentation.splitter import split_sentences
     from src.segmentation.tokenizer import count_tokens
-    from src.segmentation.calibration import estimate_optimal_k, validate_calibration
+    from src.segmentation.calibration import estimate_optimal_k, validate_calibration, suggest_lambda
 
     sentences = split_sentences(text)
     total_tokens = count_tokens(text, model=model)
+    lambda_suggested = suggest_lambda(text)
 
     # correr todos los métodos
     dp_result = segment_dp(
@@ -80,7 +82,7 @@ def generate_full_report(
             / sw_result.total_cost * 100, 2
         ),
         "segment_diff": sw_result.num_segments - dp_result.num_segments,
-        "overlap_token_diff": sw_result.total_overlap_tokens - overlap_result.total_overlap_tokens,
+        "overlap_token_diff": sw_result.total_overlap_tokens,
     }
 
     # métricas con LLM real (opcional)
@@ -100,6 +102,7 @@ def generate_full_report(
     return FullReport(
         text_length_tokens=total_tokens,
         num_sentences=len(sentences),
+        suggested_lambda=lambda_suggested,
         dp_metrics={
             "num_segments": dp_metrics.num_segments,
             "total_cost": dp_metrics.total_cost,

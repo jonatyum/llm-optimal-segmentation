@@ -1,15 +1,33 @@
 import pytest
+from unittest.mock import patch
 from src.segmentation.evaluator import (
     evaluate_segmentation,
     compare_evaluations,
     EvaluationReport,
     SegmentEvaluation,
 )
+from src.segmentation.llm_client import InferenceResult
 
 SEGMENTS = [
     "Large language models require significant computational resources for inference.",
     "Techniques like quantization help reduce inference costs substantially.",
 ]
+
+_MOCK_RESULT = InferenceResult(
+    prompt="test",
+    response="This is a test response about language models and inference.",
+    model="gemma2:2b",
+    latency_ms=150.0,
+    prompt_tokens=12,
+    response_tokens=10,
+    total_tokens=22,
+)
+
+
+@pytest.fixture(autouse=True)
+def mock_ollama():
+    with patch("src.segmentation.llm_client.run_inference", return_value=_MOCK_RESULT):
+        yield
 
 
 def test_evaluate_segmentation_returns_correct_type():

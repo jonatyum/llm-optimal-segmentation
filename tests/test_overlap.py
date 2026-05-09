@@ -63,3 +63,10 @@ def test_max_overlap_zero_produces_no_overlap():
     for segment in result.segments:
         assert segment.overlap_tokens == 0
         assert segment.overlap_sentences == []
+
+
+def test_overlap_produces_nonzero_tokens_at_coherent_boundaries():
+    result = segment_dp_overlap(TEXT, lmin=10, lmax=100, overlap_mu=0.01, max_overlap=3)
+    assert result.total_overlap_tokens > 0, (
+        "Expected nonzero overlap when overlap_mu is low and text has coherent boundaries"
+    )

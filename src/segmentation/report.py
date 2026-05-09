@@ -3,7 +3,8 @@ from src.segmentation.dp import segment_dp, segment_dp_2d, DP2DResult
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.overlap import segment_dp_overlap
 from src.segmentation.sliding_window import segment_sliding_window
-from src.segmentation.metrics import compute_metrics, compare
+from src.segmentation.texttiling import segment_texttiling
+from src.segmentation.metrics import compute_metrics, compare, compare_full_cost
 from src.segmentation.evaluator import evaluate_segmentation
 
 
@@ -16,10 +17,12 @@ class FullReport:
     baseline_metrics: dict
     overlap_metrics: dict
     sliding_window_metrics: dict
+    texttiling_metrics: dict
     dp_2d_metrics: dict
     dp_2d_analytical: dict
     dp_vs_baseline: dict
     dp_vs_sliding_window: dict
+    dp_vs_texttiling: dict
 
 
 def generate_full_report(
@@ -48,7 +51,7 @@ def generate_full_report(
         coherence_lambda=coherence_lambda,
         fixed_cost=fixed_cost,
     )
-    baseline_result = segment_baseline(text, lmax=lmax, model=model)
+    baseline_result = segment_baseline(text, lmin=lmin, lmax=lmax, model=model)
     overlap_result = segment_dp_overlap(
         text, lmin=lmin, lmax=lmax, model=model,
         coherence_lambda=coherence_lambda,
@@ -56,6 +59,7 @@ def generate_full_report(
         fixed_cost=fixed_cost,
     )
     sw_result = segment_sliding_window(text, lmax=lmax, overlap=overlap, model=model)
+    tt_result = segment_texttiling(text, lmin=lmin, lmax=lmax, model=model)
     dp2d_result = segment_dp_2d(
         text, lmin=lmin, lmax=lmax, model=model,
         coherence_lambda=coherence_lambda,
@@ -63,7 +67,7 @@ def generate_full_report(
     )
 
     # calibración analítica
-    k_analytical = estimate_optimal_k(text, model=model, fixed_cost=fixed_cost)
+    k_analytical = estimate_optimal_k(text, model=model, fixed_cost=fixed_cost, coherence_lambda=coherence_lambda)
     calibration = validate_calibration(
         text, lmin=lmin, lmax=lmax,
         coherence_lambda=coherence_lambda,
@@ -74,8 +78,10 @@ def generate_full_report(
     # métricas estáticas
     dp_metrics = compute_metrics(dp_result)
     baseline_metrics = compute_metrics(baseline_result)
+    tt_metrics = compute_metrics(tt_result)
 
     dp_vs_baseline = compare(dp_result, baseline_result)
+    dp_vs_tt = compare_full_cost(dp_result, tt_result, coherence_lambda=coherence_lambda, fixed_cost=fixed_cost, model=model)
     dp_vs_sw = {
         "cost_reduction_pct": round(
             (sw_result.total_cost - dp_result.total_cost)
@@ -131,6 +137,13 @@ def generate_full_report(
             "total_overlap_tokens": sw_result.total_overlap_tokens,
             "llm_evaluation": llm_sw,
         },
+        texttiling_metrics={
+            "num_segments": tt_metrics.num_segments,
+            "total_cost": tt_metrics.total_cost,
+            "avg_tokens": tt_metrics.avg_tokens_per_segment,
+            "std_tokens": tt_metrics.std_tokens_per_segment,
+            "avg_coherence": tt_metrics.avg_coherence,
+        },
         dp_2d_metrics={
             "optimal_k": dp2d_result.num_segments,
             "total_cost": dp2d_result.total_cost,
@@ -154,4 +167,5 @@ def generate_full_report(
             "segment_diff": dp_vs_baseline.segment_diff,
         },
         dp_vs_sliding_window=dp_vs_sw,
+        dp_vs_texttiling=dp_vs_tt,
     )

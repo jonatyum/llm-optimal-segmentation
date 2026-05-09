@@ -5,6 +5,7 @@ from src.segmentation.dp import segment_dp, segment_dp_2d
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.sliding_window import segment_sliding_window
 from src.segmentation.overlap import segment_dp_overlap
+from src.segmentation.texttiling import segment_texttiling
 from src.segmentation.metrics import compute_metrics, compare
 from src.segmentation.evaluator import evaluate_segmentation
 from src.segmentation.calibration import suggest_lambda, estimate_optimal_k, validate_calibration
@@ -91,9 +92,10 @@ if st.button("Segmentar", type="primary"):
     with st.spinner("Calculando segmentaciones..."):
         try:
             dp_result = segment_dp(text, lmin=lmin, lmax=lmax, model=model, coherence_lambda=coherence_lambda)
-            base_result = segment_baseline(text, lmax=lmax, model=model)
+            base_result = segment_baseline(text, lmin=lmin, lmax=lmax, model=model)
             sw_result = segment_sliding_window(text, lmax=lmax, overlap=overlap, model=model)
             overlap_result = segment_dp_overlap(text, lmin=lmin, lmax=lmax, model=model, coherence_lambda=coherence_lambda, overlap_mu=overlap_mu)
+            tt_result = segment_texttiling(text, lmin=lmin, lmax=lmax, model=model)
             report = compare(dp_result, base_result)
         except ValueError as e:
             st.error(f"Error: {e}")
@@ -104,6 +106,7 @@ if st.button("Segmentar", type="primary"):
     st.session_state["base_result"] = base_result
     st.session_state["sw_result"] = sw_result
     st.session_state["overlap_result"] = overlap_result
+    st.session_state["tt_result"] = tt_result
     st.session_state["report"] = report
     st.session_state["text"] = text
     st.session_state["llm_model"] = "gemma2:2b"
@@ -115,6 +118,7 @@ if "dp_result" in st.session_state:
     base_result = st.session_state["base_result"]
     sw_result = st.session_state["sw_result"]
     overlap_result = st.session_state["overlap_result"]
+    tt_result = st.session_state["tt_result"]
     report = st.session_state["report"]
 
     # ── Métricas resumen ──────────────────────────────────────────────────────
@@ -133,13 +137,14 @@ if "dp_result" in st.session_state:
 
     # ── Visualización de segmentos ────────────────────────────────────────────
     st.subheader("Distribución de tokens por segmento")
-    fig, axes = plt.subplots(1, 4, figsize=(16, 3))
+    fig, axes = plt.subplots(1, 5, figsize=(20, 3))
 
     methods = [
         (dp_result.segments, "DP Optimal", "#378ADD"),
         (base_result.segments, "Baseline", "#EF9F27"),
         (sw_result.segments, "Sliding Window", "#1D9E75"),
         (overlap_result.segments, "DP + Overlap", "#D85A30"),
+        (tt_result.segments, "TextTiling", "#7B5EA7"),
     ]
 
     for ax, (segs, title, color) in zip(axes, methods):
@@ -177,7 +182,7 @@ if "dp_result" in st.session_state:
             """
         return html
 
-    tab1, tab2, tab3, tab4 = st.tabs(["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap", "TextTiling"])
 
     with tab1:
         st.markdown(render_segments(dp_result.segments, "#378ADD"), unsafe_allow_html=True)
@@ -204,6 +209,13 @@ if "dp_result" in st.session_state:
         st.markdown(render_segments(overlap_result.segments, "#D85A30"), unsafe_allow_html=True)
         for seg in overlap_result.segments:
             with st.expander(f"Segmento {seg.index} — {seg.token_count} tokens — overlap: {seg.overlap_tokens} tok"):
+                for j, sent in enumerate(seg.sentences):
+                    st.markdown(f"**S{j}:** {sent}")
+
+    with tab5:
+        st.markdown(render_segments(tt_result.segments, "#7B5EA7"), unsafe_allow_html=True)
+        for seg in tt_result.segments:
+            with st.expander(f"Segmento {seg.index} — {seg.token_count} tokens — {len(seg.sentences)} oraciones"):
                 for j, sent in enumerate(seg.sentences):
                     st.markdown(f"**S{j}:** {sent}")
 
@@ -286,13 +298,14 @@ if "dp_result" in st.session_state:
             "Ajusta `fixed_cost` o `lmin/lmax` para acercar k* analítico al k* DP."
         )
 
+    tt_m = compute_metrics(tt_result)
     st.table({
-        "Método": ["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap"],
-        "Segmentos": [dp_result.num_segments, base_result.num_segments, sw_result.num_segments, overlap_result.num_segments],
-        "Costo total": [f"{dp_result.total_cost:,.0f}", f"{base_result.total_cost:,.0f}", f"{sw_result.total_cost:,.0f}", f"{overlap_result.total_cost:,.0f}"],
-        "Avg tokens": [dp_m.avg_tokens_per_segment, base_m.avg_tokens_per_segment, sw_m.avg_tokens_per_segment, "—"],
-        "Std tokens": [dp_m.std_tokens_per_segment, base_m.std_tokens_per_segment, sw_m.std_tokens_per_segment, "—"],
-        "Coherencia": [dp_m.avg_coherence, base_m.avg_coherence, sw_m.avg_coherence, "—"],
+        "Método": ["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap", "TextTiling"],
+        "Segmentos": [dp_result.num_segments, base_result.num_segments, sw_result.num_segments, overlap_result.num_segments, tt_result.num_segments],
+        "Costo total": [f"{dp_result.total_cost:,.0f}", f"{base_result.total_cost:,.0f}", f"{sw_result.total_cost:,.0f}", f"{overlap_result.total_cost:,.0f}", f"{tt_result.total_cost:,.0f}"],
+        "Avg tokens": [dp_m.avg_tokens_per_segment, base_m.avg_tokens_per_segment, sw_m.avg_tokens_per_segment, "—", tt_m.avg_tokens_per_segment],
+        "Std tokens": [dp_m.std_tokens_per_segment, base_m.std_tokens_per_segment, sw_m.std_tokens_per_segment, "—", tt_m.std_tokens_per_segment],
+        "Coherencia": [dp_m.avg_coherence, base_m.avg_coherence, sw_m.avg_coherence, "—", tt_m.avg_coherence],
     })
 
     # ── Evaluación LLM — botón separado ──────────────────────────────────────

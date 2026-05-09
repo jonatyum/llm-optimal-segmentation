@@ -13,6 +13,7 @@ from src.segmentation import (
     segment_baseline,
     segment_sliding_window,
     segment_dp_overlap,
+    segment_texttiling,
     compute_metrics,
     compare,
     generate_full_report,
@@ -39,7 +40,7 @@ def cmd_segment(args):
             model=args.model, fixed_cost=args.fixed_cost,
         )
     elif args.method == "baseline":
-        result = segment_baseline(args.text, lmax=args.lmax, model=args.model)
+        result = segment_baseline(args.text, lmin=args.lmin, lmax=args.lmax, model=args.model)
     elif args.method == "sliding_window":
         result = segment_sliding_window(
             args.text, lmax=args.lmax, overlap=args.overlap, model=args.model,
@@ -48,6 +49,10 @@ def cmd_segment(args):
         result = segment_dp_overlap(
             args.text, lmin=args.lmin, lmax=args.lmax,
             model=args.model, fixed_cost=args.fixed_cost,
+        )
+    elif args.method == "texttiling":
+        result = segment_texttiling(
+            args.text, lmin=args.lmin, lmax=args.lmax, model=args.model,
         )
     elif args.method == "dp2d":
         result = segment_dp_2d(
@@ -90,7 +95,7 @@ def cmd_compare(args):
         args.text, lmin=args.lmin, lmax=args.lmax,
         model=args.model, fixed_cost=args.fixed_cost,
     )
-    base_result = segment_baseline(args.text, lmax=args.lmax, model=args.model)
+    base_result = segment_baseline(args.text, lmin=args.lmin, lmax=args.lmax, model=args.model)
     report = compare(dp_result, base_result)
 
     print(f"{'Método':<20} {'Segmentos':>10} {'Costo':>12} {'Avg tok':>10} {'Coherencia':>12}")
@@ -126,6 +131,7 @@ def cmd_report(args):
     print(f"{'Baseline':<20} {report.baseline_metrics['num_segments']:>10} {report.baseline_metrics['total_cost']:>12,.0f}")
     print(f"{'Sliding Window':<20} {report.sliding_window_metrics['num_segments']:>10} {report.sliding_window_metrics['total_cost']:>12,.0f}")
     print(f"{'DP + Overlap':<20} {report.overlap_metrics['num_segments']:>10} {report.overlap_metrics['total_cost']:>12,.0f}")
+    print(f"{'TextTiling':<20} {report.texttiling_metrics['num_segments']:>10} {report.texttiling_metrics['total_cost']:>12,.0f}")
     print(f"{'DP 2D':<20} {report.dp_2d_metrics['optimal_k']:>10} {report.dp_2d_metrics['total_cost']:>12,.0f}")
     print_separator()
     print(f"Reducción costo DP vs Baseline:        {report.dp_vs_baseline['cost_reduction_pct']}%")
@@ -199,7 +205,7 @@ def main():
     seg_parser = subparsers.add_parser("segment", help="Segmentar con un método específico")
     seg_parser.add_argument(
         "--method", type=str, default="dp",
-        choices=["dp", "baseline", "sliding_window", "overlap", "dp2d"],
+        choices=["dp", "baseline", "sliding_window", "overlap", "dp2d", "texttiling"],
         help="Método de segmentación"
     )
 

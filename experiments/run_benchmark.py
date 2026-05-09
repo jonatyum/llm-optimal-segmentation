@@ -32,6 +32,7 @@ from src.segmentation.dp import segment_dp, segment_dp_2d
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.sliding_window import segment_sliding_window
 from src.segmentation.overlap import segment_dp_overlap
+from src.segmentation.texttiling import segment_texttiling
 from src.segmentation.metrics import compute_metrics, recompute_full_cost
 from src.segmentation.calibration import estimate_optimal_k, validate_calibration
 from src.segmentation.tokenizer import count_tokens
@@ -77,11 +78,13 @@ def run_one(
         text, lmin=lmin, lmax=lmax, model=model,
         coherence_lambda=coherence_lambda, fixed_cost=fixed_cost,
     )
+    tt = segment_texttiling(text, lmin=lmin, lmax=lmax, model=model)
 
     m_dp = compute_metrics(dp)
     m_base = compute_metrics(base)
     m_sw = compute_metrics(sw)
     m_ov = compute_metrics(ov)
+    m_tt = compute_metrics(tt)
 
     # FIX 12: usar recompute_full_cost para comparación justa con la misma función de costo
     dp_full_cost = recompute_full_cost(
@@ -138,6 +141,14 @@ def run_one(
             "total_cost": dp2d.total_cost,
             "cost_by_k": {str(k): v for k, v in dp2d.cost_by_k.items()},
         },
+        "texttiling": {
+            "num_segments": m_tt.num_segments,
+            "total_cost": m_tt.total_cost,
+            "avg_tokens": m_tt.avg_tokens_per_segment,
+            "std_tokens": m_tt.std_tokens_per_segment,
+            "avg_coherence": m_tt.avg_coherence,
+            "token_counts": [s.token_count for s in tt.segments],
+        },
         "calibration": cal,
         "k_analytical": k_star,
         "reductions": {
@@ -145,6 +156,7 @@ def run_one(
             "dp_vs_baseline_full_pct": pct(dp_full_cost, base_full_cost),
             "dp_vs_sliding_window_pct": pct(m_dp.total_cost, sw.total_cost),
             "dp_vs_overlap_pct": pct(m_dp.total_cost, m_ov.total_cost),
+            "dp_vs_texttiling_pct": pct(m_dp.total_cost, m_tt.total_cost),
         },
     }
 
@@ -181,14 +193,14 @@ def _compute_statistics(results: list[dict]) -> dict:
 
 
 def print_results(corpus: list[dict], results: list[dict]) -> None:
-    sep = "─" * 80
+    sep = "─" * 88
     print(sep)
-    print(f"{'BENCHMARK — Resultados por texto':^80}")
+    print(f"{'BENCHMARK — Resultados por texto':^88}")
     print(sep)
 
-    header = f"{'Texto':<28} {'Tok':>5} {'DP seg':>6} {'DP costo':>10} {'Base costo':>10} {'DP<Base%':>9} {'DP<SW%':>8}"
+    header = f"{'Texto':<28} {'Tok':>5} {'DP seg':>6} {'DP costo':>10} {'Base costo':>10} {'TT costo':>10} {'DP<Base%':>9} {'DP<SW%':>8}"
     print(header)
-    print("─" * 80)
+    print("─" * 88)
 
     for doc, res in zip(corpus, results):
         print(
@@ -197,11 +209,12 @@ def print_results(corpus: list[dict], results: list[dict]) -> None:
             f"{res['dp']['num_segments']:>6} "
             f"{res['dp']['total_cost']:>10,.0f} "
             f"{res['baseline']['total_cost']:>10,.0f} "
+            f"{res['texttiling']['total_cost']:>10,.0f} "
             f"{res['reductions']['dp_vs_baseline_pct']:>8.2f}% "
             f"{res['reductions']['dp_vs_sliding_window_pct']:>7.2f}%"
         )
 
-    print(sep)
+    print("─" * 88)
 
     # promedios
     avg_vs_base = np.mean([r["reductions"]["dp_vs_baseline_pct"] for r in results])
@@ -360,6 +373,136 @@ def _plot_comparison_tokens(
     print(f"Figura guardada: {out_path}")
 
 
+def analyze_failures(corpus: list[dict], results: list[dict], params: dict) -> dict:
+    """Identifica textos con indicadores de problema en los resultados del benchmark."""
+    sep = "═" * 64
+
+    invalid_cal: list[dict] = []
+    dp_no_improve: list[dict] = []
+    k_far: list[dict] = []
+    overlap_ineffective: list[dict] = []
+    irregular_segs: list[dict] = []
+
+    for doc, res in zip(corpus, results):
+        title = doc["title"]
+        cal = res["calibration"]
+        dp = res["dp"]
+        ov = res["dp_overlap"]
+
+        if not cal["valid"]:
+            invalid_cal.append({
+                "title": title,
+                "k_dp": cal["k_dp"],
+                "k_analytical": cal["k_analytical"],
+                "suboptimality": cal.get("relative_suboptimality"),
+            })
+
+        dp_full = res["dp"]["full_cost"]
+        base_full = res["baseline"]["full_cost"]
+        if base_full > 0 and (base_full - dp_full) / base_full * 100 <= 0:
+            dp_no_improve.append({"title": title, "dp_full": dp_full, "base_full": base_full})
+
+        if cal["deviation_pct"] > 0.15:
+            k_far.append({
+                "title": title,
+                "k_dp": cal["k_dp"],
+                "k_analytical": cal["k_analytical"],
+                "deviation_pct": cal["deviation_pct"],
+            })
+
+        if ov.get("total_overlap_tokens", 0) == 0:
+            overlap_ineffective.append({"title": title})
+
+        avg_t = dp["avg_tokens"]
+        std_t = dp["std_tokens"]
+        if avg_t > 0 and std_t > 0.5 * avg_t:
+            irregular_segs.append({
+                "title": title,
+                "avg_tokens": avg_t,
+                "std_tokens": std_t,
+                "ratio": round(std_t / avg_t, 3),
+            })
+
+    print(sep)
+    print("ANÁLISIS DE FALLOS")
+    print(sep)
+
+    def _print_group(label: str, items: list[dict], formatter) -> None:
+        print(f"{label} ({len(items)}):")
+        if items:
+            for item in items:
+                print(f"  - {formatter(item)}")
+        else:
+            print("  ninguno")
+
+    _print_group(
+        "Calibración inválida",
+        invalid_cal,
+        lambda x: (
+            f"{x['title']}: k_dp={x['k_dp']}, k*={x['k_analytical']}, "
+            f"suboptimality={x['suboptimality'] * 100:.0f}%"
+            if x["suboptimality"] is not None
+            else f"{x['title']}: k_dp={x['k_dp']}, k*={x['k_analytical']}, suboptimality=N/A"
+        ),
+    )
+    print()
+
+    _print_group(
+        "DP no mejora sobre baseline",
+        dp_no_improve,
+        lambda x: f"{x['title']}: dp_full={x['dp_full']:,.0f}, base_full={x['base_full']:,.0f}",
+    )
+    print()
+
+    _print_group(
+        "k* lejano del analítico (dev>15%)",
+        k_far,
+        lambda x: (
+            f"{x['title']}: k_dp={x['k_dp']}, k*={x['k_analytical']}, "
+            f"dev={x['deviation_pct']:.0%}"
+        ),
+    )
+    print()
+
+    _print_group(
+        "Overlap inefectivo",
+        overlap_ineffective,
+        lambda x: x["title"],
+    )
+    print()
+
+    _print_group(
+        "Segmentos irregulares (std > 0.5*avg)",
+        irregular_segs,
+        lambda x: (
+            f"{x['title']}: avg={x['avg_tokens']:.1f}, std={x['std_tokens']:.1f}, "
+            f"ratio={x['ratio']}"
+        ),
+    )
+    print()
+
+    problem_titles = set(
+        [x["title"] for x in invalid_cal]
+        + [x["title"] for x in dp_no_improve]
+        + [x["title"] for x in k_far]
+        + [x["title"] for x in overlap_ineffective]
+        + [x["title"] for x in irregular_segs]
+    )
+    total = len(corpus)
+    print(f"Resumen: {len(problem_titles)}/{total} textos tienen al menos un indicador de problema.")
+    print(sep)
+
+    return {
+        "invalid_calibration": invalid_cal,
+        "dp_no_improve_over_baseline": dp_no_improve,
+        "k_far_from_analytical": k_far,
+        "overlap_ineffective": overlap_ineffective,
+        "irregular_segments": irregular_segs,
+        "texts_with_problems": len(problem_titles),
+        "total_texts": total,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="Benchmark de segmentación")
     parser.add_argument("--lmin", type=int, default=20)
@@ -400,15 +543,20 @@ def main():
     print()
     print_results(corpus, results)
 
+    params = {
+        "lmin": args.lmin, "lmax": args.lmax, "overlap": args.overlap,
+        "model": args.model, "coherence_lambda": args.coherence_lambda,
+        "overlap_mu": args.mu, "fixed_cost": args.fixed_cost,
+    }
+
+    print()
+    failure_analysis = analyze_failures(corpus, results, params)
+
     stats = _compute_statistics(results)
 
     if args.save_json:
         out = {
-            "params": {
-                "lmin": args.lmin, "lmax": args.lmax, "overlap": args.overlap,
-                "model": args.model, "coherence_lambda": args.coherence_lambda,
-                "overlap_mu": args.mu, "fixed_cost": args.fixed_cost,
-            },
+            "params": params,
             "corpus": [{"id": d["id"], "title": d["title"], "domain": d["domain"]}
                        for d in corpus],
             "results": results,
@@ -423,6 +571,7 @@ def main():
                     float(np.mean([r["baseline"]["avg_coherence"] for r in results])), 4),
             },
             "statistics": stats,
+            "failure_analysis": failure_analysis,
         }
         os.makedirs(os.path.dirname(args.save_json), exist_ok=True)
         with open(args.save_json, "w", encoding="utf-8") as f:

@@ -2,6 +2,7 @@ from src.segmentation.dp import segment_dp, segment_dp_2d, DP2DResult
 from src.segmentation.baseline import segment_baseline
 from src.segmentation.overlap import segment_dp_overlap
 from src.segmentation.sliding_window import segment_sliding_window
+from src.segmentation.texttiling import segment_texttiling
 from src.segmentation.metrics import (
     compute_metrics,
     compare,
@@ -33,6 +34,7 @@ __all__ = [
     "segment_baseline",
     "segment_dp_overlap",
     "segment_sliding_window",
+    "segment_texttiling",
     "compute_metrics",
     "compare",
     "recompute_full_cost",

@@ -69,6 +69,12 @@ def test_report_dp_vs_sliding_window_has_required_keys():
         assert key in report.dp_vs_sliding_window
 
 
+def test_report_has_suggested_lambda():
+    report = generate_full_report(TEXT, lmin=10, lmax=100)
+    assert hasattr(report, "suggested_lambda")
+    assert report.suggested_lambda in (0.3, 0.5, 0.8)
+
+
 def test_report_without_llm_evaluation():
     report = generate_full_report(TEXT, lmin=10, lmax=100, run_llm_evaluation=False)
     assert report.dp_metrics["llm_evaluation"] == {}

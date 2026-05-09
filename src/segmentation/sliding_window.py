@@ -1,3 +1,4 @@
+# sliding_window.py — ventana deslizante con overlap fijo
 from dataclasses import dataclass
 from src.segmentation.models import SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
@@ -91,6 +92,7 @@ def segment_sliding_window(
         step = max(1, len(current_sentences) - overlap_skip)
         i += step
 
+    # costo total = suma de tokens² (sin penalización de coherencia)
     total_cost = sum(s.token_count ** 2 for s in segments)
     total_overlap_tokens = sum(s.overlap_tokens for s in segments)
 

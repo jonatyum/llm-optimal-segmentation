@@ -19,6 +19,7 @@ from src.segmentation import (
     suggest_lambda,
     estimate_optimal_k,
     validate_calibration,
+    calibrate_fixed_cost,
 )
 
 
@@ -131,6 +132,7 @@ def cmd_report(args):
     print(f"Mejora coherencia DP vs Baseline:      {report.dp_vs_baseline['coherence_improvement']:+.4f}")
     print(f"Reducción costo DP vs Sliding Window:  {report.dp_vs_sliding_window['cost_reduction_pct']}%")
     print_separator()
+    print(f"λ sugerido:          {report.suggested_lambda}")
     print(f"k* analítico:        {report.dp_2d_metrics['k_analytical']}")
     print(f"k* DP 2D:            {report.dp_2d_metrics['optimal_k']}")
     print(f"Desviación:          {report.dp_2d_metrics['deviation_pct']:.1%}")
@@ -168,6 +170,17 @@ def cmd_calibrate(args):
     if not calibration["valid"]:
         print("Recomendación: ajusta fixed_cost o lmin/lmax para mejorar la calibración.")
 
+    print_separator()
+    print(f"Calibrando costo fijo con LLM ({args.llm_model})...")
+    print("(requiere Ollama corriendo — omite si no está disponible)")
+    try:
+        cf_calibrated = calibrate_fixed_cost(llm_model=args.llm_model)
+        print(f"Costo fijo calibrado (Cf):  {cf_calibrated:.1f}")
+        k_recalc = estimate_optimal_k(args.text, model=args.model, fixed_cost=cf_calibrated)
+        print(f"k* recalculado con Cf real: {k_recalc}")
+    except Exception:
+        print("Ollama no disponible — omitiendo calibración de Cf real.")
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -178,7 +191,7 @@ def main():
     parser.add_argument("--lmax", type=int, default=150, help="Tokens máximos por segmento")
     parser.add_argument("--overlap", type=int, default=20, help="Overlap para sliding window")
     parser.add_argument("--model", type=str, default="gpt-4o", help="Modelo de tokenización")
-    parser.add_argument("--fixed-cost", type=float, default=100.0, help="Costo fijo por segmento")
+    parser.add_argument("--fixed-cost", type=float, default=1000.0, help="Costo fijo por segmento")
 
     subparsers = parser.add_subparsers(dest="command")
 

@@ -7,6 +7,7 @@ from src.segmentation.sliding_window import segment_sliding_window
 from src.segmentation.overlap import segment_dp_overlap
 from src.segmentation.metrics import compute_metrics, compare
 from src.segmentation.evaluator import evaluate_segmentation
+from src.segmentation.calibration import suggest_lambda, estimate_optimal_k, validate_calibration
 
 st.set_page_config(
     page_title="LLM Optimal Segmentation",
@@ -44,12 +45,12 @@ with st.sidebar:
     )
     overlap_mu = st.slider(
         "μ — peso del costo de overlap",
-        0.0, 2.0, 0.3, step=0.1,
+        0.0, 2.0, 0.03, step=0.01,
         help="Penaliza el overlap excesivo entre segmentos consecutivos. μ=0 ignora el overlap, valores altos lo minimizan."
     )
     fixed_cost = st.slider(
         "Costo fijo por segmento",
-        0.0, 2000.0, 100.0, step=50.0,
+        0.0, 2000.0, 1000.0, step=50.0,
         help="Overhead fijo por cada llamada al LLM. Valores altos favorecen menos segmentos más grandes. Produce la curva en U en la DP 2D."
     )
     model = st.selectbox(
@@ -250,6 +251,40 @@ if "dp_result" in st.session_state:
 
         except ValueError as e:
             st.warning(f"DP 2D: {e}")
+
+    # ── Calibración analítica ─────────────────────────────────────────────────
+    st.subheader("Calibración de parámetros")
+
+    with st.spinner("Calculando calibración..."):
+        cal_lambda = suggest_lambda(st.session_state["text"])
+        cal_k_star = estimate_optimal_k(st.session_state["text"], fixed_cost=fixed_cost)
+        cal_result = validate_calibration(
+            st.session_state["text"],
+            lmin=lmin, lmax=lmax,
+            coherence_lambda=coherence_lambda,
+            fixed_cost=fixed_cost,
+        )
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("λ sugerido", cal_lambda,
+                help="Valor óptimo de λ según variabilidad de coherencia del texto")
+    col2.metric("k* analítico", cal_k_star,
+                help="Número óptimo de segmentos estimado por fórmula: k* = n/√Cf")
+    col3.metric("k* DP 2D", cal_result["k_dp"],
+                help="Número óptimo encontrado por el algoritmo DP 2D")
+    col4.metric(
+        "Desviación k*",
+        f"{cal_result['deviation_pct']:.1%}",
+        delta="válida ✓" if cal_result["valid"] else "revisar ✗",
+        delta_color="normal" if cal_result["valid"] else "inverse",
+        help="Desviación entre k* analítico y k* DP. ≤20% es válida."
+    )
+
+    if not cal_result["valid"]:
+        st.warning(
+            f"Calibración fuera de rango (desviación {cal_result['deviation_pct']:.1%}). "
+            "Ajusta `fixed_cost` o `lmin/lmax` para acercar k* analítico al k* DP."
+        )
 
     st.table({
         "Método": ["DP Optimal", "Baseline", "Sliding Window", "DP + Overlap"],

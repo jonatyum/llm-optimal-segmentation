@@ -1,3 +1,4 @@
+# baseline.py — chunking fijo greedy O(n)
 from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
@@ -20,6 +21,7 @@ def segment_baseline(
     seg_index = 0
 
     for sentence, tok_len in zip(sentences, token_lens):
+        # cortar si agregar esta oración supera lmax
         if current_tokens + tok_len > lmax and current_sentences:
             segments.append(Segment(
                 index=seg_index,
@@ -42,6 +44,7 @@ def segment_baseline(
             token_count=current_tokens,
         ))
 
+    # costo total = suma de tokens² de cada segmento
     total_cost = sum(s.token_count ** 2 for s in segments)
 
     return SegmentationResult(

@@ -1,6 +1,7 @@
+# splitter.py — detección de oraciones con spaCy
 import spacy
 
-_nlp = None
+_nlp = None  # singleton — se carga una sola vez
 
 
 def _get_nlp():
@@ -10,6 +11,7 @@ def _get_nlp():
     return _nlp
 
 
+# divide texto en oraciones — unidades atómicas del DP
 def split_sentences(text: str) -> list[str]:
     nlp = _get_nlp()
     doc = nlp(text.strip())

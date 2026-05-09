@@ -1,3 +1,4 @@
+# overlap.py — DP con overlap como variable de optimización
 from dataclasses import dataclass
 from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
@@ -7,9 +8,9 @@ import numpy as np
 
 INF = float("inf")
 DEFAULT_LAMBDA = 0.5
-DEFAULT_MU = 0.3
+DEFAULT_MU = 0.3  # peso de penalización de overlap
 DEFAULT_MAX_OVERLAP = 3
-DEFAULT_FIXED_COST = 100.0
+DEFAULT_FIXED_COST = 1000.0
 
 
 @dataclass
@@ -40,8 +41,10 @@ def _compute_cost(
     overlap_mu: float,
     fixed_cost: float = DEFAULT_FIXED_COST,
 ) -> float:
+    # Componente 1: costo cuadrático de autoatención
     computational_cost = float(token_count ** 2)
 
+    # Componente 2: penalización de coherencia semántica
     if end - start < 2:
         coherence_penalty = 0.0
     else:
@@ -52,6 +55,7 @@ def _compute_cost(
         avg_coherence = float(np.mean(scores))
         coherence_penalty = 1.0 - avg_coherence
 
+    # Componente 3: penalización cuadrática de overlap
     overlap_cost = float(overlap_tokens ** 2)
 
     return (
@@ -88,7 +92,7 @@ def segment_dp_overlap(
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
 
-    # dp[j][o] = costo minimo para segmentar hasta oracion j con overlap o
+    # dp[j][o] = costo mínimo llegando a oración j con o oraciones de overlap
     dp = [[INF] * (max_overlap + 1) for _ in range(n + 1)]
     back = [[(-1, 0)] * (max_overlap + 1) for _ in range(n + 1)]
     dp[0][0] = 0.0
@@ -118,7 +122,7 @@ def segment_dp_overlap(
                     dp[j][o] = cost
                     back[j][o] = (i, o)
 
-    # encontrar el overlap optimo para dp[n]
+    # seleccionar overlap óptimo para dp[n]
     best_cost = INF
     best_o = 0
     for o in range(max_overlap + 1):
@@ -132,7 +136,7 @@ def segment_dp_overlap(
             f"Try relaxing the token constraints."
         )
 
-    # backtracking
+    # backtracking — reconstruir segmentos con overlap
     cuts = []
     cur = n
     cur_o = best_o
@@ -143,7 +147,7 @@ def segment_dp_overlap(
         cur_o = prev_o
     cuts.reverse()
 
-    # construir segmentos con overlap
+    # construir objetos OverlapSegment con metadatos de overlap
     segments = []
     prev = 0
     total_overlap_tokens = 0

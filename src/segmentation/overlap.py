@@ -1,10 +1,11 @@
 # overlap.py — DP con overlap como variable de optimización
+import bisect
 from dataclasses import dataclass
 from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
 from src.segmentation.embeddings import get_embeddings, cosine_similarity
-from src.segmentation.dp import _build_similarity_arrays, _avg_coherence
+from src.segmentation.dp import _build_similarity_arrays, _avg_coherence, _merge_to_limit
 import numpy as np
 
 INF = float("inf")
@@ -75,12 +76,15 @@ def segment_dp_overlap(
     overlap_mu: float = DEFAULT_MU,
     max_overlap: int = DEFAULT_MAX_OVERLAP,
     fixed_cost: float = DEFAULT_FIXED_COST,
+    max_sentences: int | None = None,
 ) -> OverlapSegmentationResult:
     sentences = split_sentences(text)
     if not sentences:
         raise ValueError("No sentences found in input text.")
 
     token_lens = count_tokens_batch(sentences, model=model)
+    if max_sentences is not None:
+        sentences, token_lens = _merge_to_limit(sentences, token_lens, max_sentences)
     n = len(sentences)
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
@@ -92,10 +96,10 @@ def segment_dp_overlap(
     dp[0][0] = 0.0
 
     for j in range(1, n + 1):
-        for i in range(j):
+        target_min = cumtok[j] - lmax  # span ≤ lmax → cumtok[i] ≥ target_min
+        i_start = bisect.bisect_left(cumtok, target_min, 0, j)
+        for i in range(i_start, j):
             span = cumtok[j] - cumtok[i]
-            if span > lmax:
-                continue
             if span < lmin:
                 break  # span decrece al crecer i
             for o in range(max_overlap + 1):

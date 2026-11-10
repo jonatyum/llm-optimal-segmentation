@@ -1,0 +1,58 @@
+======================================================================
+RESUMEN EJECUTIVO — Tesis LLM Optimal Segmentation
+Juan Jonatan Churata Apaza | UMSA 2025
+======================================================================
+
+PARÁMETROS CANÓNICOS
+  lmin=20  lmax=150  λ=0.5
+  μ=0.03  Cf=2000.0  modelo=gpt-4o
+
+CORPUS
+  N textos:    20 textos en español
+  Tokens:      total=12,941  promedio=647  rango=[340,1141]
+  Coherencia:  promedio=0.4423
+  Dominios:    15 (Algorithms, Biology, Deep Learning, Economics, Geography...)
+
+ANÁLISIS ESTADÍSTICO (función de costo recomputada — comparación justa)
+  Comparación                     Reduc%  IC95%               t(19)    p        d       Efecto
+  -------------------------------------------------------------------------------------
+  DP vs Baseline                  43.88%  [41.22%, 46.55%]  17.3740   0.0000  3.8849  grande
+  DP vs Sliding Window            26.02%  [21.61%, 30.42%]   9.2477   0.0000  2.0678  grande
+  DP vs DP+Overlap                -0.30%  [-0.49%, -0.12%]  -4.4650   0.0003  -0.9984  grande
+  DP vs TextTiling                14.73%  [11.90%, 17.57%]   8.2023   0.0000  1.8341  grande
+  Todos los efectos son estadísticamente significativos con FDR (Benjamini-Hochberg)
+
+BENCHMARK (costos nativos de cada método)
+  Reducción DP vs Baseline:      21.22%
+  Reducción DP vs Sliding Window:26.02%
+  Coherencia DP:  0.8994   Baseline: 0.4960   Mejora: +0.4034
+  Pk Baseline vs DP:    0.5685
+  Pk TextTiling vs DP:  0.5464
+
+CALIBRACIÓN k* ANALÍTICO
+  Cf usado: 2000.0
+  Válido (sub-optimalidad ≤5%):  3/20
+  Válido (desviación ≤20%):       15/20
+  Desviación media:               17.0% ± 9.9%
+
+ANÁLISIS DE SENSIBILIDAD (grid λ × Cf)
+  λ ∈ [0.0, 0.5, 1.0, 1.5, 2.0]
+  Cf ∈ [200.0, 500.0, 1000.0, 2000.0, 5000.0]
+  k* varía: [9.2, 13.7]  (rango = 4.5 segs — robusto)
+  Reducción varía: [12.0%, 72.4%]  (variación = 60.3pp)
+  Mejor combinación: λ=2.0, Cf=200.0 → 72.4%
+
+COMPLEJIDAD COMPUTACIONAL EMPÍRICA
+  Pendiente log-log DP:       ≈O(n^0.93)
+  Pendiente log-log Baseline: ≈O(n^1.00)
+  Pendiente log-log TT:       ≈O(n^0.92)
+  (3 repeticiones por punto, mediana)
+
+CASOS DE ESTUDIO
+  Textos analizados: 8
+  Sim. frontera DP:       0.4544
+  Sim. frontera Baseline: 0.4487
+  DP mejora fronteras en: 3/8 casos
+  Reducción costo promedio: 41.02%
+
+======================================================================

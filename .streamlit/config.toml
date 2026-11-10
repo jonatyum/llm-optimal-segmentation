@@ -1,0 +1,13 @@
+[server]
+maxUploadSize = 5
+
+# Tema fijado a CLARO para la defensa: el diseño (tarjetas blancas, gráficos Plotly con
+# fondo blanco, colores de texto oscuros) está pensado para fondo claro. Fijarlo evita que
+# el navegador/proyector use modo oscuro y deje textos oscuros sobre fondo oscuro (invisibles).
+[theme]
+base = "light"
+primaryColor = "#1d4ed8"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f1f5f9"
+textColor = "#0f172a"
+font = "sans serif"

@@ -97,6 +97,7 @@ def validate_calibration(
     coherence_lambda: float = 0.5,
     fixed_cost: float = 1000.0,
     model: str = "gpt-4o",
+    max_sentences: int | None = None,
 ) -> dict:
     """Valida la calibración comparando el k* del DP 2D vs el k* analítico.
 
@@ -121,6 +122,7 @@ def validate_calibration(
         model=model,
         coherence_lambda=coherence_lambda,
         fixed_cost=fixed_cost,
+        max_sentences=max_sentences,
     )
     k_dp = dp2d_result.num_segments
     k_analytical = estimate_optimal_k(

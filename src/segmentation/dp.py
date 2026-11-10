@@ -3,11 +3,37 @@ from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
 from src.segmentation.embeddings import get_embeddings, cosine_similarity
+import bisect
+import math
 import numpy as np
 
 INF = float("inf")
 DEFAULT_LAMBDA = 0.5        # peso de coherencia semántica
 DEFAULT_FIXED_COST = 1000.0  # overhead fijo por llamada al LLM
+
+
+def _merge_to_limit(
+    sentences: list[str],
+    token_lens: list[int],
+    max_n: int,
+) -> tuple[list[str], list[int]]:
+    """Fusiona oraciones consecutivas en grupos para reducir n ≤ max_n.
+
+    Usa grupos de tamaño ceil(n/max_n) — O(n), preserva orden.
+    Solo actúa si len(sentences) > max_n.
+    """
+    n = len(sentences)
+    if n <= max_n:
+        return sentences, token_lens
+    group_size = math.ceil(n / max_n)
+    merged_sentences = []
+    merged_tokens = []
+    for i in range(0, n, group_size):
+        chunk_sents = sentences[i:i + group_size]
+        chunk_tokens = token_lens[i:i + group_size]
+        merged_sentences.append(" ".join(chunk_sents))
+        merged_tokens.append(sum(chunk_tokens))
+    return merged_sentences, merged_tokens
 
 
 def _build_similarity_arrays(embeddings: np.ndarray) -> tuple[list[float], list[float]]:
@@ -72,12 +98,15 @@ def segment_dp(
     model: str = "gpt-4o",
     coherence_lambda: float = DEFAULT_LAMBDA,
     fixed_cost: float = DEFAULT_FIXED_COST,
+    max_sentences: int | None = None,
 ) -> SegmentationResult:
     sentences = split_sentences(text)
     if not sentences:
         raise ValueError("No sentences found in input text.")
 
     token_lens = count_tokens_batch(sentences, model=model)
+    if max_sentences is not None:
+        sentences, token_lens = _merge_to_limit(sentences, token_lens, max_sentences)
     n = len(sentences)
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
@@ -87,11 +116,11 @@ def segment_dp(
     back = [-1] * (n + 1)  # punteros para reconstrucción por backtracking
     dp[0] = 0.0
 
-    for j in range(1, n + 1):  # O(n^2)
-        for i in range(j):
+    for j in range(1, n + 1):  # O(n·w)
+        target_min = cumtok[j] - lmax  # span ≤ lmax → cumtok[i] ≥ target_min
+        i_start = bisect.bisect_left(cumtok, target_min, 0, j)
+        for i in range(i_start, j):
             span = cumtok[j] - cumtok[i]
-            if span > lmax:
-                continue
             if span < lmin:
                 break  # al avanzar i hacia j el span solo decrece
             cost = dp[i] + _compute_cost(
@@ -159,12 +188,15 @@ def segment_dp_2d(
     coherence_lambda: float = DEFAULT_LAMBDA,
     max_k: int = None,
     fixed_cost: float = DEFAULT_FIXED_COST,
+    max_sentences: int | None = None,
 ) -> DP2DResult:
     sentences = split_sentences(text)
     if not sentences:
         raise ValueError("No sentences found in input text.")
 
     token_lens = count_tokens_batch(sentences, model=model)
+    if max_sentences is not None:
+        sentences, token_lens = _merge_to_limit(sentences, token_lens, max_sentences)
     n = len(sentences)
     cumtok = _build_cumulative_tokens(token_lens)
     embeddings = get_embeddings(sentences)
@@ -180,10 +212,10 @@ def segment_dp_2d(
 
     for k in range(1, max_k + 1):
         for j in range(k, n + 1):
-            for i in range(k - 1, j):
+            target_min = cumtok[j] - lmax  # span ≤ lmax → cumtok[i] ≥ target_min
+            i_start = bisect.bisect_left(cumtok, target_min, k - 1, j)
+            for i in range(i_start, j):
                 span = cumtok[j] - cumtok[i]
-                if span > lmax:
-                    continue
                 if span < lmin:
                     break  # span solo decrece al aumentar i
                 if dp[i][k - 1] == INF:

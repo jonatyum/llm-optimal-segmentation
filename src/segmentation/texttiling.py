@@ -5,6 +5,7 @@ from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
 from src.segmentation.embeddings import get_embeddings, cosine_similarity
+from src.segmentation.dp import _merge_to_limit
 
 
 def _block_centroid(embeddings: np.ndarray, start: int, end: int) -> np.ndarray:
@@ -43,6 +44,7 @@ def segment_texttiling(
     model: str = "gpt-4o",
     window_size: int = 2,
     smoothing_passes: int = 1,
+    max_sentences: int | None = None,
 ) -> SegmentationResult:
     """Segmentación TextTiling con comparación de bloques de embeddings semánticos.
 
@@ -56,6 +58,9 @@ def segment_texttiling(
 
     n = len(sentences)
     token_lens = count_tokens_batch(sentences, model=model)
+    if max_sentences is not None:
+        sentences, token_lens = _merge_to_limit(sentences, token_lens, max_sentences)
+        n = len(sentences)
     cumtok = [0] * (n + 1)
     for i, t in enumerate(token_lens):
         cumtok[i + 1] = cumtok[i] + t

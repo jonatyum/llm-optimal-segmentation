@@ -2,6 +2,7 @@
 import spacy
 
 _nlp = None  # singleton — se carga una sola vez
+_CHUNK_SIZE = 800_000  # máx chars por chunk (spaCy limita a 1M por defecto)
 
 
 def _get_nlp():
@@ -11,8 +12,33 @@ def _get_nlp():
     return _nlp
 
 
-# divide texto en oraciones — unidades atómicas del DP
+def _split_into_chunks(text: str) -> list[str]:
+    """Divide texto largo en chunks respetando límite de spaCy, cortando en párrafos."""
+    if len(text) <= _CHUNK_SIZE:
+        return [text]
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + _CHUNK_SIZE
+        if end >= len(text):
+            chunks.append(text[start:])
+            break
+        # Preferir corte en párrafo → salto de línea → punto
+        for sep in ('\n\n', '\n', '. ', ' '):
+            pos = text.rfind(sep, start, end)
+            if pos > start:
+                end = pos + len(sep)
+                break
+        chunks.append(text[start:end])
+        start = end
+    return chunks
+
+
 def split_sentences(text: str) -> list[str]:
     nlp = _get_nlp()
-    doc = nlp(text.strip())
-    return [sent.text.strip() for sent in doc.sents if sent.text.strip()]
+    text = text.strip()
+    sentences = []
+    for chunk in _split_into_chunks(text):
+        doc = nlp(chunk)
+        sentences.extend(s.text.strip() for s in doc.sents if s.text.strip())
+    return sentences

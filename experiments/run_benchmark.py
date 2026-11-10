@@ -36,6 +36,7 @@ from src.segmentation.texttiling import segment_texttiling
 from src.segmentation.metrics import compute_metrics, recompute_full_cost
 from src.segmentation.calibration import estimate_optimal_k, validate_calibration
 from src.segmentation.tokenizer import count_tokens
+from src.segmentation.segmentation_metrics import boundaries_from_result, pk, window_diff
 
 
 CORPUS_PATH = os.path.join(
@@ -106,6 +107,26 @@ def run_one(
     def pct(a, b):
         return round((b - a) / b * 100, 2) if b > 0 else 0.0
 
+    # Métricas de frontera Pk y WindowDiff — DP como referencia óptima
+    try:
+        dp_bounds = boundaries_from_result(dp)
+        _pk_base = pk(dp_bounds, boundaries_from_result(base))
+        _pk_sw = pk(dp_bounds, boundaries_from_result(sw))
+        _pk_ov = pk(dp_bounds, boundaries_from_result(ov))
+        _pk_tt = pk(dp_bounds, boundaries_from_result(tt))
+        _wd_base = window_diff(dp_bounds, boundaries_from_result(base))
+        _wd_sw = window_diff(dp_bounds, boundaries_from_result(sw))
+        _wd_ov = window_diff(dp_bounds, boundaries_from_result(ov))
+        _wd_tt = window_diff(dp_bounds, boundaries_from_result(tt))
+        boundary_metrics = {
+            "baseline":       {"pk_vs_dp": round(_pk_base, 6), "wd_vs_dp": round(_wd_base, 6)},
+            "sliding_window": {"pk_vs_dp": round(_pk_sw, 6),   "wd_vs_dp": round(_wd_sw, 6)},
+            "dp_overlap":     {"pk_vs_dp": round(_pk_ov, 6),   "wd_vs_dp": round(_wd_ov, 6)},
+            "texttiling":     {"pk_vs_dp": round(_pk_tt, 6),   "wd_vs_dp": round(_wd_tt, 6)},
+        }
+    except Exception:
+        boundary_metrics = {}
+
     return {
         "total_tokens": count_tokens(text, model=model),
         "dp": {
@@ -151,6 +172,7 @@ def run_one(
         },
         "calibration": cal,
         "k_analytical": k_star,
+        "boundary_metrics": boundary_metrics,
         "reductions": {
             "dp_vs_baseline_pct": pct(m_dp.total_cost, m_base.total_cost),
             "dp_vs_baseline_full_pct": pct(dp_full_cost, base_full_cost),
@@ -161,35 +183,72 @@ def run_one(
     }
 
 
-def _compute_statistics(results: list[dict]) -> dict:
-    """IC95% y t-test pareado para la reducción de costo DP vs Baseline."""
-    dp_costs = np.array([r["dp"]["full_cost"] for r in results])
-    base_costs = np.array([r["baseline"]["full_cost"] for r in results])
+def _cohens_d_paired(a: np.ndarray, b: np.ndarray) -> float:
+    """Cohen's d para muestras pareadas: d = mean(b-a) / std(b-a, ddof=1)."""
+    diff = b - a
+    sd = np.std(diff, ddof=1)
+    return float(np.mean(diff) / sd) if sd > 0 else 0.0
 
-    if len(dp_costs) < 2:
-        return {}
 
-    reductions = (base_costs - dp_costs) / np.where(base_costs > 0, base_costs, 1.0) * 100
+def _fdr_bh(p_values: list[float]) -> list[float]:
+    """Corrección FDR de Benjamini-Hochberg con enforcement de monotonicidad."""
+    n = len(p_values)
+    order = sorted(range(n), key=lambda i: p_values[i])
+    adjusted = [p_values[order[i]] * n / (i + 1) for i in range(n)]
+    for i in range(n - 2, -1, -1):
+        adjusted[i] = min(adjusted[i], adjusted[i + 1])
+    result = [0.0] * n
+    for rank, idx in enumerate(order):
+        result[idx] = min(adjusted[rank], 1.0)
+    return result
 
+
+def _analyze_pair(label: str, dp_c: np.ndarray, other_c: np.ndarray) -> dict:
+    n = len(dp_c)
+    reductions = (other_c - dp_c) / np.where(other_c > 0, other_c, 1.0) * 100
     mean_red = float(np.mean(reductions))
-    n = len(reductions)
-
-    # IC95% via scipy.stats.t.interval
-    ci = scipy.stats.t.interval(
-        0.95, df=n - 1, loc=mean_red, scale=scipy.stats.sem(reductions)
-    )
-
-    # t-test pareado
-    t_stat, p_value = scipy.stats.ttest_rel(base_costs, dp_costs)
-
+    ci = scipy.stats.t.interval(0.95, df=n - 1, loc=mean_red, scale=scipy.stats.sem(reductions))
+    t_stat, p_value = scipy.stats.ttest_rel(other_c, dp_c)
+    d = _cohens_d_paired(dp_c, other_c)
     return {
+        "comparison": label,
+        "n": n,
         "mean_reduction_pct": round(mean_red, 4),
         "ci95_low": round(float(ci[0]), 4),
         "ci95_high": round(float(ci[1]), 4),
-        "ttest_paired_t": round(float(t_stat), 6),
-        "ttest_paired_p": round(float(p_value), 6),
-        "n": n,
+        "t_stat": round(float(t_stat), 6),
+        "p_value": round(float(p_value), 6),
+        "cohens_d": round(d, 4),
+        "significant": bool(p_value < 0.05),
     }
+
+
+def _compute_statistics(results: list[dict]) -> dict:
+    """Tests estadísticos completos: t-test, Cohen's d, IC95%, FDR para todas las comparaciones."""
+    if len(results) < 2:
+        return {}
+
+    dp_full = np.array([r["dp"]["full_cost"] for r in results])
+    base_full = np.array([r["baseline"]["full_cost"] for r in results])
+    dp_native = np.array([r["dp"]["total_cost"] for r in results])
+    sw_costs = np.array([r["sliding_window"]["total_cost"] for r in results])
+    ov_costs = np.array([r["dp_overlap"]["total_cost"] for r in results])
+    tt_costs = np.array([r["texttiling"]["total_cost"] for r in results])
+
+    comparisons = [
+        _analyze_pair("DP vs Baseline (full cost)", dp_full, base_full),
+        _analyze_pair("DP vs Sliding Window", dp_native, sw_costs),
+        _analyze_pair("DP vs DP+Overlap", dp_native, ov_costs),
+        _analyze_pair("DP vs TextTiling", dp_native, tt_costs),
+    ]
+
+    # FDR sobre las 4 comparaciones (Benjamini-Hochberg)
+    fdr = _fdr_bh([c["p_value"] for c in comparisons])
+    for comp, p_adj in zip(comparisons, fdr):
+        comp["p_value_fdr"] = round(p_adj, 6)
+        comp["significant_fdr"] = bool(p_adj < 0.05)
+
+    return {"comparisons": comparisons}
 
 
 def print_results(corpus: list[dict], results: list[dict]) -> None:
@@ -228,14 +287,62 @@ def print_results(corpus: list[dict], results: list[dict]) -> None:
     print(f"Coherencia promedio Baseline:            {avg_coh_base:.4f}")
     print(f"Mejora coherencia DP vs Baseline:        {avg_coh_dp - avg_coh_base:+.4f}")
 
-    # FIX 12: IC95% y t-test pareado con función de costo completa
     stats = _compute_statistics(results)
     if stats:
         print(sep)
-        print("Comparación justa (función de costo completa del DP):")
-        print(f"  Reducción media:  {stats['mean_reduction_pct']:.2f}%")
-        print(f"  IC95%:            [{stats['ci95_low']:.2f}%, {stats['ci95_high']:.2f}%]")
-        print(f"  t-test pareado:   t={stats['ttest_paired_t']:.4f}, p={stats['ttest_paired_p']:.4f}")
+        print("Análisis estadístico — t-test pareado, Cohen's d, FDR (Benjamini-Hochberg):")
+        print(f"  {'Comparación':<30} {'Reduc%':>7} {'IC95%':>20} {'t':>9} {'p':>10} {'p_FDR':>10} {'d':>7} {'Sig.':>5}")
+        print("  " + "─" * 80)
+        for c in stats["comparisons"]:
+            sig = "✓" if c["significant"] else "✗"
+            fdr_sig = "✓" if c["significant_fdr"] else "✗"
+            print(
+                f"  {c['comparison']:<30} "
+                f"{c['mean_reduction_pct']:>6.2f}% "
+                f"[{c['ci95_low']:>5.2f}%,{c['ci95_high']:>5.2f}%] "
+                f"{c['t_stat']:>9.4f} "
+                f"{c['p_value']:>10.4f} "
+                f"{c['p_value_fdr']:>10.4f} "
+                f"{c['cohens_d']:>7.4f} "
+                f"{sig}/{fdr_sig}"
+            )
+        print("  Sig. = p<0.05 sin corr. / con FDR")
+
+    print(sep)
+    print("Métricas de frontera — Pk y WindowDiff (referencia = DP Óptimo, 0 = acuerdo perfecto):")
+    print(f"  {'Texto':<28} {'Pk Base':>8} {'WD Base':>8} {'Pk SW':>7} {'WD SW':>7} {'Pk TT':>7} {'WD TT':>7}")
+    print("  " + "─" * 70)
+    for doc, res in zip(corpus, results):
+        bm = res.get("boundary_metrics", {})
+        def _fmt(v):
+            return f"{v:.4f}" if v is not None else "   N/A"
+        bm_base = bm.get("baseline", {})
+        bm_sw   = bm.get("sliding_window", {})
+        bm_tt   = bm.get("texttiling", {})
+        print(
+            f"  {doc['title'][:27]:<28} "
+            f"{_fmt(bm_base.get('pk_vs_dp')):>8} "
+            f"{_fmt(bm_base.get('wd_vs_dp')):>8} "
+            f"{_fmt(bm_sw.get('pk_vs_dp')):>7} "
+            f"{_fmt(bm_sw.get('wd_vs_dp')):>7} "
+            f"{_fmt(bm_tt.get('pk_vs_dp')):>7} "
+            f"{_fmt(bm_tt.get('wd_vs_dp')):>7}"
+        )
+    # Promedios
+    def _avg_bm(method, key):
+        vals = [r.get("boundary_metrics", {}).get(method, {}).get(key) for r in results]
+        vals = [v for v in vals if v is not None]
+        return float(np.mean(vals)) if vals else float("nan")
+    print("  " + "─" * 70)
+    print(
+        f"  {'PROMEDIO':<28} "
+        f"{_avg_bm('baseline','pk_vs_dp'):>8.4f} "
+        f"{_avg_bm('baseline','wd_vs_dp'):>8.4f} "
+        f"{_avg_bm('sliding_window','pk_vs_dp'):>7.4f} "
+        f"{_avg_bm('sliding_window','wd_vs_dp'):>7.4f} "
+        f"{_avg_bm('texttiling','pk_vs_dp'):>7.4f} "
+        f"{_avg_bm('texttiling','wd_vs_dp'):>7.4f}"
+    )
 
     print(sep)
     print("Calibración k*:")
@@ -301,14 +408,21 @@ def _plot_cost_vs_lmax(
         (base - dp) / base * 100
         for dp, base in zip(dp_ys, base_ys)
     ]
-    ax2.bar(xs, reductions, color="#378ADD", width=18, alpha=0.85)
+    bar_colors = ["#378ADD" if r >= 0 else "#d62728" for r in reductions]
+    ax2.bar(xs, reductions, color=bar_colors, width=18, alpha=0.85)
     ax2.set_title("Reducción de costo DP vs Baseline (%)")
     ax2.set_xlabel("lmax (tokens máximos por segmento)")
     ax2.set_ylabel("Reducción (%)")
-    ax2.set_ylim(0, 100)
+    # Eje Y: incluir zona negativa si existe, con margen cómodo
+    r_min = min(reductions)
+    r_max = max(reductions)
+    ax2.set_ylim(min(r_min - 8, -5), r_max + 12)
+    ax2.axhline(0, color="#333", linewidth=0.8, alpha=0.5)
     ax2.grid(True, alpha=0.3, axis="y")
     for x, r in zip(xs, reductions):
-        ax2.text(x, r + 1.5, f"{r:.1f}%", ha="center", va="bottom", fontsize=9)
+        va = "bottom" if r >= 0 else "top"
+        offset = 1.5 if r >= 0 else -1.5
+        ax2.text(x, r + offset, f"{r:.1f}%", ha="center", va=va, fontsize=9)
 
     plt.suptitle(f'Análisis de costo por lmax — "{corpus[0]["title"]}"', fontsize=11)
     plt.tight_layout()
@@ -555,6 +669,11 @@ def main():
     stats = _compute_statistics(results)
 
     if args.save_json:
+        def _avg_bm(method, key):
+            vals = [r.get("boundary_metrics", {}).get(method, {}).get(key) for r in results]
+            vals = [v for v in vals if v is not None]
+            return round(float(np.mean(vals)), 6) if vals else None
+
         out = {
             "params": params,
             "corpus": [{"id": d["id"], "title": d["title"], "domain": d["domain"]}
@@ -569,6 +688,12 @@ def main():
                     float(np.mean([r["dp"]["avg_coherence"] for r in results])), 4),
                 "avg_coherence_baseline": round(
                     float(np.mean([r["baseline"]["avg_coherence"] for r in results])), 4),
+                "avg_pk_baseline_vs_dp":      _avg_bm("baseline", "pk_vs_dp"),
+                "avg_wd_baseline_vs_dp":      _avg_bm("baseline", "wd_vs_dp"),
+                "avg_pk_sw_vs_dp":            _avg_bm("sliding_window", "pk_vs_dp"),
+                "avg_wd_sw_vs_dp":            _avg_bm("sliding_window", "wd_vs_dp"),
+                "avg_pk_texttiling_vs_dp":    _avg_bm("texttiling", "pk_vs_dp"),
+                "avg_wd_texttiling_vs_dp":    _avg_bm("texttiling", "wd_vs_dp"),
             },
             "statistics": stats,
             "failure_analysis": failure_analysis,

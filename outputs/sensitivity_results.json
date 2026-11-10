@@ -1,0 +1,200 @@
+{
+  "params": {
+    "lmin": 20,
+    "lmax": 150,
+    "model": "gpt-4o",
+    "max_sentences": 100,
+    "n_texts": 10
+  },
+  "lambda_values": [
+    0.0,
+    0.5,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "cf_values": [
+    200.0,
+    500.0,
+    1000.0,
+    2000.0,
+    5000.0
+  ],
+  "results": {
+    "lambda=0.0_cf=200.0": {
+      "lambda": 0.0,
+      "fixed_cost": 200.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 53.16980254296635,
+      "n_texts": 10
+    },
+    "lambda=0.0_cf=500.0": {
+      "lambda": 0.0,
+      "fixed_cost": 500.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 49.120407639844856,
+      "n_texts": 10
+    },
+    "lambda=0.0_cf=1000.0": {
+      "lambda": 0.0,
+      "fixed_cost": 1000.0,
+      "mean_k_star": 13.6,
+      "mean_reduction_pct": 42.72529634797531,
+      "n_texts": 10
+    },
+    "lambda=0.0_cf=2000.0": {
+      "lambda": 0.0,
+      "fixed_cost": 2000.0,
+      "mean_k_star": 13.1,
+      "mean_reduction_pct": 31.503671183473067,
+      "n_texts": 10
+    },
+    "lambda=0.0_cf=5000.0": {
+      "lambda": 0.0,
+      "fixed_cost": 5000.0,
+      "mean_k_star": 9.2,
+      "mean_reduction_pct": 12.036785538713966,
+      "n_texts": 10
+    },
+    "lambda=0.5_cf=200.0": {
+      "lambda": 0.5,
+      "fixed_cost": 200.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 60.83606267061293,
+      "n_texts": 10
+    },
+    "lambda=0.5_cf=500.0": {
+      "lambda": 0.5,
+      "fixed_cost": 500.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 57.49112057944565,
+      "n_texts": 10
+    },
+    "lambda=0.5_cf=1000.0": {
+      "lambda": 0.5,
+      "fixed_cost": 1000.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 52.14740500331832,
+      "n_texts": 10
+    },
+    "lambda=0.5_cf=2000.0": {
+      "lambda": 0.5,
+      "fixed_cost": 2000.0,
+      "mean_k_star": 13.5,
+      "mean_reduction_pct": 42.3301213632364,
+      "n_texts": 10
+    },
+    "lambda=0.5_cf=5000.0": {
+      "lambda": 0.5,
+      "fixed_cost": 5000.0,
+      "mean_k_star": 11.3,
+      "mean_reduction_pct": 20.57733686211767,
+      "n_texts": 10
+    },
+    "lambda=1.0_cf=200.0": {
+      "lambda": 1.0,
+      "fixed_cost": 200.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 65.94395550645376,
+      "n_texts": 10
+    },
+    "lambda=1.0_cf=500.0": {
+      "lambda": 1.0,
+      "fixed_cost": 500.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 63.092849861491814,
+      "n_texts": 10
+    },
+    "lambda=1.0_cf=1000.0": {
+      "lambda": 1.0,
+      "fixed_cost": 1000.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 58.50675472683753,
+      "n_texts": 10
+    },
+    "lambda=1.0_cf=2000.0": {
+      "lambda": 1.0,
+      "fixed_cost": 2000.0,
+      "mean_k_star": 13.6,
+      "mean_reduction_pct": 49.92946962987728,
+      "n_texts": 10
+    },
+    "lambda=1.0_cf=5000.0": {
+      "lambda": 1.0,
+      "fixed_cost": 5000.0,
+      "mean_k_star": 12.6,
+      "mean_reduction_pct": 29.140228617451584,
+      "n_texts": 10
+    },
+    "lambda=1.5_cf=200.0": {
+      "lambda": 1.5,
+      "fixed_cost": 200.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 69.59998510349625,
+      "n_texts": 10
+    },
+    "lambda=1.5_cf=500.0": {
+      "lambda": 1.5,
+      "fixed_cost": 500.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 67.11447436500477,
+      "n_texts": 10
+    },
+    "lambda=1.5_cf=1000.0": {
+      "lambda": 1.5,
+      "fixed_cost": 1000.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 63.096912283399796,
+      "n_texts": 10
+    },
+    "lambda=1.5_cf=2000.0": {
+      "lambda": 1.5,
+      "fixed_cost": 2000.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 55.49867298405418,
+      "n_texts": 10
+    },
+    "lambda=1.5_cf=5000.0": {
+      "lambda": 1.5,
+      "fixed_cost": 5000.0,
+      "mean_k_star": 13.0,
+      "mean_reduction_pct": 36.261299401517334,
+      "n_texts": 10
+    },
+    "lambda=2.0_cf=200.0": {
+      "lambda": 2.0,
+      "fixed_cost": 200.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 72.35244171623825,
+      "n_texts": 10
+    },
+    "lambda=2.0_cf=500.0": {
+      "lambda": 2.0,
+      "fixed_cost": 500.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 70.14867702736998,
+      "n_texts": 10
+    },
+    "lambda=2.0_cf=1000.0": {
+      "lambda": 2.0,
+      "fixed_cost": 1000.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 66.5734608678619,
+      "n_texts": 10
+    },
+    "lambda=2.0_cf=2000.0": {
+      "lambda": 2.0,
+      "fixed_cost": 2000.0,
+      "mean_k_star": 13.7,
+      "mean_reduction_pct": 59.767412611608925,
+      "n_texts": 10
+    },
+    "lambda=2.0_cf=5000.0": {
+      "lambda": 2.0,
+      "fixed_cost": 5000.0,
+      "mean_k_star": 13.2,
+      "mean_reduction_pct": 42.04412891713271,
+      "n_texts": 10
+    }
+  }
+}

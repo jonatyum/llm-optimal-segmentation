@@ -1,0 +1,1067 @@
+[
+  {
+    "id": "llm_inference",
+    "title": "Inferencia en Modelos de Lenguaje y Ventanas de Contexto",
+    "domain": "LLM",
+    "n_sentences": 13,
+    "dp": {
+      "num_segments": 12,
+      "total_cost": 34272.0,
+      "avg_boundary_sim": 0.3637,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.3262,
+          "last_sentence": "Los modelos de lenguaje de gran escala procesan el texto de entrada a través del",
+          "first_sentence": "Para una secuencia de n tokens, la matriz de atención contiene n² entradas, y ca"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.3374,
+          "last_sentence": "Para una secuencia de n tokens, la matriz de atención contiene n² entradas, y ca",
+          "first_sentence": "Esta escala cuadrática implica que duplicar la longitud de entrada cuadruplica e"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 2,
+          "similarity": 0.4485,
+          "last_sentence": "Esta escala cuadrática implica que duplicar la longitud de entrada cuadruplica e",
+          "first_sentence": "El tamaño de la ventana de contexto determina la cantidad máxima de tokens que e"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 3,
+          "similarity": 0.337,
+          "last_sentence": "El tamaño de la ventana de contexto determina la cantidad máxima de tokens que e",
+          "first_sentence": "Antes varias técnicas buscan reducir el costo de inferencia sin sacrificar de ma"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 4,
+          "similarity": 0.1653,
+          "last_sentence": "Antes varias técnicas buscan reducir el costo de inferencia sin sacrificar de ma",
+          "first_sentence": "La cuantización reduce la precisión numérica de los pesos del modelo de 32 a 8 o"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 5,
+          "similarity": 0.1654,
+          "last_sentence": "La cuantización reduce la precisión numérica de los pesos del modelo de 32 a 8 o",
+          "first_sentence": "La destilación del conocimiento entrena un modelo estudiante más pequeño para im"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 7,
+          "similarity": 0.2406,
+          "last_sentence": "Técnicas como",
+          "first_sentence": "la atención agrupada por consultas y la atención de ventana deslizante limitan e"
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 8,
+          "similarity": 0.3942,
+          "last_sentence": "la atención agrupada por consultas y la atención de ventana deslizante limitan e",
+          "first_sentence": "La generación aumentada por recuperación representa un paradigma alternativo que"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 9,
+          "similarity": 0.5325,
+          "last_sentence": "La generación aumentada por recuperación representa un paradigma alternativo que",
+          "first_sentence": "En lugar de incluir todo el conocimiento relevante dentro del contexto del model"
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 10,
+          "similarity": 0.5495,
+          "last_sentence": "En lugar de incluir todo el conocimiento relevante dentro del contexto del model",
+          "first_sentence": "Esto permite responder preguntas sobre colecciones de documentos que superan amp"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 11,
+          "similarity": 0.5038,
+          "last_sentence": "Esto permite responder preguntas sobre colecciones de documentos que superan amp",
+          "first_sentence": "Por otro lado, el ajuste fino sobre datos específicos de un dominio mejora el de"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 4,
+      "total_cost": 60582,
+      "avg_boundary_sim": 0.3821,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 2,
+          "similarity": 0.4485,
+          "last_sentence": "Esta escala cuadrática implica que duplicar la longitud de entrada cuadruplica e",
+          "first_sentence": "El tamaño de la ventana de contexto determina la cantidad máxima de tokens que e"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 5,
+          "similarity": 0.1654,
+          "last_sentence": "La cuantización reduce la precisión numérica de los pesos del modelo de 32 a 8 o",
+          "first_sentence": "La destilación del conocimiento entrena un modelo estudiante más pequeño para im"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 9,
+          "similarity": 0.5325,
+          "last_sentence": "La generación aumentada por recuperación representa un paradigma alternativo que",
+          "first_sentence": "En lugar de incluir todo el conocimiento relevante dentro del contexto del model"
+        }
+      ]
+    },
+    "cost_reduction_pct": 43.43,
+    "boundary_quality_improvement": 0.0185
+  },
+  {
+    "id": "dynamic_programming",
+    "title": "Programación Dinámica y Subestructura Óptima",
+    "domain": "Algorithms",
+    "n_sentences": 15,
+    "dp": {
+      "num_segments": 12,
+      "total_cost": 38387.0,
+      "avg_boundary_sim": 0.4734,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.6301,
+          "last_sentence": "La programación dinámica es un paradigma de diseño algorítmico para resolver pro",
+          "first_sentence": "El principio de optimalidad, formalizado por Richard Bellman en la década de 195"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.3874,
+          "last_sentence": "El principio de optimalidad, formalizado por Richard Bellman en la década de 195",
+          "first_sentence": "Esta propiedad permite descomponer un problema complejo en partes más pequeñas,"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 2,
+          "similarity": 0.3612,
+          "last_sentence": "Esta propiedad permite descomponer un problema complejo en partes más pequeñas,",
+          "first_sentence": "El ejemplo clásico es el problema del camino más corto: el trayecto óptimo entre"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 3,
+          "similarity": 0.4349,
+          "last_sentence": "El ejemplo clásico es el problema del camino más corto: el trayecto óptimo entre",
+          "first_sentence": "En la práctica, los algoritmos de programación dinámica se implementan mediante"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 5,
+          "similarity": 0.5463,
+          "last_sentence": "La tabulación bottom-up parte de los casos base más simples y construye progresi",
+          "first_sentence": "La memoización top-down, en cambio, parte del problema completo y resuelve los s"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 6,
+          "similarity": 0.648,
+          "last_sentence": "La memoización top-down, en cambio, parte del problema completo y resuelve los s",
+          "first_sentence": "Ambas estrategias producen el mismo resultado, pero difieren en sus perfiles de"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 8,
+          "similarity": 0.3489,
+          "last_sentence": "La tabulación suele ser más eficiente en la práctica por evitar",
+          "first_sentence": "la sobrecarga de las llamadas recursivas, mientras que la memoización resulta má"
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 9,
+          "similarity": 0.4388,
+          "last_sentence": "la sobrecarga de las llamadas recursivas, mientras que la memoización resulta má",
+          "first_sentence": "Los problemas de partición de secuencias constituyen una aplicación paradigmátic"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 10,
+          "similarity": 0.4286,
+          "last_sentence": "Los problemas de partición de secuencias constituyen una aplicación paradigmátic",
+          "first_sentence": "Dado un texto de n tokens, se busca una partición en k segmentos que minimice un"
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 11,
+          "similarity": 0.4437,
+          "last_sentence": "Dado un texto de n tokens, se busca una partición en k segmentos que minimice un",
+          "first_sentence": "Si el costo de cada segmento puede calcularse en tiempo constante y se almacenan"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 12,
+          "similarity": 0.5398,
+          "last_sentence": "Si el costo de cada segmento puede calcularse en tiempo constante y se almacenan",
+          "first_sentence": "Este enfoque supera a las heurísticas voraces porque considera el impacto de cad"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 4,
+      "total_cost": 65545,
+      "avg_boundary_sim": 0.4454,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 2,
+          "similarity": 0.3612,
+          "last_sentence": "Esta propiedad permite descomponer un problema complejo en partes más pequeñas,",
+          "first_sentence": "El ejemplo clásico es el problema del camino más corto: el trayecto óptimo entre"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 5,
+          "similarity": 0.5463,
+          "last_sentence": "La tabulación bottom-up parte de los casos base más simples y construye progresi",
+          "first_sentence": "La memoización top-down, en cambio, parte del problema completo y resuelve los s"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 10,
+          "similarity": 0.4286,
+          "last_sentence": "Los problemas de partición de secuencias constituyen una aplicación paradigmátic",
+          "first_sentence": "Dado un texto de n tokens, se busca una partición en k segmentos que minimice un"
+        }
+      ]
+    },
+    "cost_reduction_pct": 41.43,
+    "boundary_quality_improvement": -0.0281
+  },
+  {
+    "id": "semantic_coherence",
+    "title": "Coherencia Semántica y Embeddings de Texto",
+    "domain": "NLP",
+    "n_sentences": 14,
+    "dp": {
+      "num_segments": 13,
+      "total_cost": 43223.0,
+      "avg_boundary_sim": 0.4821,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.7196,
+          "last_sentence": "La coherencia semántica es la propiedad de un texto por la cual las oraciones co",
+          "first_sentence": "Un texto con alta coherencia semántica fluye naturalmente de una idea a la sigui"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.3817,
+          "last_sentence": "Un texto con alta coherencia semántica fluye naturalmente de una idea a la sigui",
+          "first_sentence": "La coherencia puede medirse a distintos niveles: coherencia local, referida a la"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 3,
+          "similarity": 0.3446,
+          "last_sentence": "si el texto completo se articula en torno a un tema central identificable.",
+          "first_sentence": "Los modelos computacionales de coherencia deben capturar tanto las relaciones lé"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 4,
+          "similarity": 0.6213,
+          "last_sentence": "Los modelos computacionales de coherencia deben capturar tanto las relaciones lé",
+          "first_sentence": "Los modelos de embeddings de oraciones producen representaciones vectoriales den"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 5,
+          "similarity": 0.5738,
+          "last_sentence": "Los modelos de embeddings de oraciones producen representaciones vectoriales den",
+          "first_sentence": "Sentence-BERT, una adaptación del modelo BERT que utiliza arquitecturas siamesas"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 6,
+          "similarity": 0.1445,
+          "last_sentence": "Sentence-BERT, una adaptación del modelo BERT que utiliza arquitecturas siamesas",
+          "first_sentence": "El modelo all-MiniLM-L6-v2, derivado de esta familia, genera embeddings de 384 d"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 7,
+          "similarity": 0.2165,
+          "last_sentence": "El modelo all-MiniLM-L6-v2, derivado de esta familia, genera embeddings de 384 d",
+          "first_sentence": "Otros modelos, como los de la familia E5 o los embeddings multilingües de LaBSE,"
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 8,
+          "similarity": 0.5853,
+          "last_sentence": "Otros modelos, como los de la familia E5 o los embeddings multilingües de LaBSE,",
+          "first_sentence": "Dada una secuencia de embeddings de oraciones, la similitud coseno entre pares c"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 9,
+          "similarity": 0.518,
+          "last_sentence": "Dada una secuencia de embeddings de oraciones, la similitud coseno entre pares c",
+          "first_sentence": "Una similitud elevada entre dos oraciones adyacentes indica que ambas abordan el"
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 10,
+          "similarity": 0.4748,
+          "last_sentence": "Una similitud elevada entre dos oraciones adyacentes indica que ambas abordan el",
+          "first_sentence": "Una caída brusca en la similitud coseno señala un cambio de tema y constituye un"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 11,
+          "similarity": 0.6919,
+          "last_sentence": "Una caída brusca en la similitud coseno señala un cambio de tema y constituye un",
+          "first_sentence": "Al incorporar esta señal en la función de costo del algoritmo de segmentación, e"
+        },
+        {
+          "after_segment": 11,
+          "after_sentence_idx": 12,
+          "similarity": 0.5127,
+          "last_sentence": "Al incorporar esta señal en la función de costo del algoritmo de segmentación, e",
+          "first_sentence": "El parámetro de penalización que pondera la coherencia frente al costo computaci"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 5,
+      "total_cost": 72858,
+      "avg_boundary_sim": 0.4024,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 3,
+          "similarity": 0.3446,
+          "last_sentence": "si el texto completo se articula en torno a un tema central identificable.",
+          "first_sentence": "Los modelos computacionales de coherencia deben capturar tanto las relaciones lé"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 5,
+          "similarity": 0.5738,
+          "last_sentence": "Los modelos de embeddings de oraciones producen representaciones vectoriales den",
+          "first_sentence": "Sentence-BERT, una adaptación del modelo BERT que utiliza arquitecturas siamesas"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 7,
+          "similarity": 0.2165,
+          "last_sentence": "El modelo all-MiniLM-L6-v2, derivado de esta familia, genera embeddings de 384 d",
+          "first_sentence": "Otros modelos, como los de la familia E5 o los embeddings multilingües de LaBSE,"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 10,
+          "similarity": 0.4748,
+          "last_sentence": "Una similitud elevada entre dos oraciones adyacentes indica que ambas abordan el",
+          "first_sentence": "Una caída brusca en la similitud coseno señala un cambio de tema y constituye un"
+        }
+      ]
+    },
+    "cost_reduction_pct": 40.68,
+    "boundary_quality_improvement": -0.0796
+  },
+  {
+    "id": "transformer_architecture",
+    "title": "Arquitectura Transformer y Mecanismo de Autoatención",
+    "domain": "Deep Learning",
+    "n_sentences": 16,
+    "dp": {
+      "num_segments": 13,
+      "total_cost": 36157.0,
+      "avg_boundary_sim": 0.3523,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.2289,
+          "last_sentence": "La arquitectura Transformer, introducida por Vaswani y colaboradores en 2017, tr",
+          "first_sentence": "La innovación central es el mecanismo de atención multi-cabeza, que permite a ca"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.4457,
+          "last_sentence": "La innovación central es el mecanismo de atención multi-cabeza, que permite a ca",
+          "first_sentence": "A diferencia de las redes recurrentes, que procesan los tokens de manera secuenc"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 2,
+          "similarity": 0.2938,
+          "last_sentence": "A diferencia de las redes recurrentes, que procesan los tokens de manera secuenc",
+          "first_sentence": "La operación de atención calcula puntuaciones de compatibilidad entre vectores d"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 3,
+          "similarity": 0.3748,
+          "last_sentence": "La operación de atención calcula puntuaciones de compatibilidad entre vectores d",
+          "first_sentence": "y produce una suma ponderada de los vectores de valor, con complejidad temporal"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 5,
+          "similarity": 0.2714,
+          "last_sentence": "en la longitud de la secuencia.",
+          "first_sentence": "El preentrenamiento de modelos de gran escala sobre corpus textuales masivos rev"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 6,
+          "similarity": 0.4905,
+          "last_sentence": "El preentrenamiento de modelos de gran escala sobre corpus textuales masivos rev",
+          "first_sentence": "BERT demostró que el preentrenamiento bidireccional mediante el modelado de leng"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 7,
+          "similarity": 0.3286,
+          "last_sentence": "BERT demostró que el preentrenamiento bidireccional mediante el modelado de leng",
+          "first_sentence": "variadas con cantidades modestas de datos etiquetados."
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 9,
+          "similarity": 0.2293,
+          "last_sentence": "Los modelos GPT extendieron este paradigma hacia la generación autoregresiva, en",
+          "first_sentence": "Modelos modernos como LLaMA, Gemini y Claude escalan estos principios hasta cien"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 11,
+          "similarity": 0.3391,
+          "last_sentence": "no se observan en modelos de menor escala.",
+          "first_sentence": "Durante la inferencia, los modelos de lenguaje generan texto de manera autoregre"
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 12,
+          "similarity": 0.3721,
+          "last_sentence": "Durante la inferencia, los modelos de lenguaje generan texto de manera autoregre",
+          "first_sentence": "Este proceso es inherentemente secuencial y se vuelve costoso para salidas larga"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 13,
+          "similarity": 0.4839,
+          "last_sentence": "Este proceso es inherentemente secuencial y se vuelve costoso para salidas larga",
+          "first_sentence": "El caché de clave-valor almacena los vectores calculados en pasos anteriores par"
+        },
+        {
+          "after_segment": 11,
+          "after_sentence_idx": 14,
+          "similarity": 0.3701,
+          "last_sentence": "El caché de clave-valor almacena los vectores calculados en pasos anteriores par",
+          "first_sentence": "La eficiencia en la inferencia constituye uno de los principales desafíos de ing"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 4,
+      "total_cost": 66009,
+      "avg_boundary_sim": 0.2746,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 2,
+          "similarity": 0.2938,
+          "last_sentence": "A diferencia de las redes recurrentes, que procesan los tokens de manera secuenc",
+          "first_sentence": "La operación de atención calcula puntuaciones de compatibilidad entre vectores d"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 8,
+          "similarity": 0.158,
+          "last_sentence": "variadas con cantidades modestas de datos etiquetados.",
+          "first_sentence": "Los modelos GPT extendieron este paradigma hacia la generación autoregresiva, en"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 12,
+          "similarity": 0.3721,
+          "last_sentence": "Durante la inferencia, los modelos de lenguaje generan texto de manera autoregre",
+          "first_sentence": "Este proceso es inherentemente secuencial y se vuelve costoso para salidas larga"
+        }
+      ]
+    },
+    "cost_reduction_pct": 45.22,
+    "boundary_quality_improvement": -0.0777
+  },
+  {
+    "id": "text_segmentation",
+    "title": "Métodos de Segmentación de Texto",
+    "domain": "NLP",
+    "n_sentences": 17,
+    "dp": {
+      "num_segments": 13,
+      "total_cost": 38032.0,
+      "avg_boundary_sim": 0.4345,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.5699,
+          "last_sentence": "La segmentación de texto es el problema de dividir un documento en fragmentos co",
+          "first_sentence": "Sus aplicaciones incluyen la generación aumentada por recuperación, donde los do"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.3928,
+          "last_sentence": "Sus aplicaciones incluyen la generación aumentada por recuperación, donde los do",
+          "first_sentence": "el texto con esquemas de salida predefinidos."
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 3,
+          "similarity": 0.5259,
+          "last_sentence": "El enfoque más simple, conocido como chunking de tamaño fijo, divide el texto en",
+          "first_sentence": "Este método es rápido y no requiere modelos auxiliares, pero con frecuencia cort"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 4,
+          "similarity": 0.3209,
+          "last_sentence": "Este método es rápido y no requiere modelos auxiliares, pero con frecuencia cort",
+          "first_sentence": "La ventana deslizante con solapamiento mejora la cobertura en recuperación al ga"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 5,
+          "similarity": 0.263,
+          "last_sentence": "La ventana deslizante con solapamiento mejora la cobertura en recuperación al ga",
+          "first_sentence": "Los métodos de segmentación semántica utilizan"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 7,
+          "similarity": 0.2967,
+          "last_sentence": "la similitud entre embeddings para identificar fronteras temáticas y situar los",
+          "first_sentence": "TextTiling es un método clásico que compara la distribución de vocabulario entre"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 9,
+          "similarity": 0.2609,
+          "last_sentence": "C99 extiende esta idea mediante análisis de correlación a diferentes escalas.",
+          "first_sentence": "Enfoques más recientes ajustan encoders de transformers para predecir directamen"
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 10,
+          "similarity": 0.3195,
+          "last_sentence": "Enfoques más recientes ajustan encoders de transformers para predecir directamen",
+          "first_sentence": "Aunque estos métodos producen segmentos semánticamente más homogéneos que el chu"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 12,
+          "similarity": 0.5294,
+          "last_sentence": "no optimizan explícitamente ninguna función de calidad global sobre la segmentac",
+          "first_sentence": "La formulación como problema de optimización global supera las limitaciones de l"
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 13,
+          "similarity": 0.6112,
+          "last_sentence": "La formulación como problema de optimización global supera las limitaciones de l",
+          "first_sentence": "El costo total puede descomponerse como la suma de los costos individuales de ca"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 14,
+          "similarity": 0.5202,
+          "last_sentence": "El costo total puede descomponerse como la suma de los costos individuales de ca",
+          "first_sentence": "Esta formulación permite incorporar criterios heterogéneos: el número de tokens"
+        },
+        {
+          "after_segment": 11,
+          "after_sentence_idx": 15,
+          "similarity": 0.6032,
+          "last_sentence": "Esta formulación permite incorporar criterios heterogéneos: el número de tokens",
+          "first_sentence": "El resultado es una segmentación que equilibra eficiencia computacional y calida"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 5,
+      "total_cost": 65171,
+      "avg_boundary_sim": 0.4888,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 3,
+          "similarity": 0.5259,
+          "last_sentence": "El enfoque más simple, conocido como chunking de tamaño fijo, divide el texto en",
+          "first_sentence": "Este método es rápido y no requiere modelos auxiliares, pero con frecuencia cort"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 7,
+          "similarity": 0.2967,
+          "last_sentence": "la similitud entre embeddings para identificar fronteras temáticas y situar los",
+          "first_sentence": "TextTiling es un método clásico que compara la distribución de vocabulario entre"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 12,
+          "similarity": 0.5294,
+          "last_sentence": "no optimizan explícitamente ninguna función de calidad global sobre la segmentac",
+          "first_sentence": "La formulación como problema de optimización global supera las limitaciones de l"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 15,
+          "similarity": 0.6032,
+          "last_sentence": "Esta formulación permite incorporar criterios heterogéneos: el número de tokens",
+          "first_sentence": "El resultado es una segmentación que equilibra eficiencia computacional y calida"
+        }
+      ]
+    },
+    "cost_reduction_pct": 41.64,
+    "boundary_quality_improvement": 0.0543
+  },
+  {
+    "id": "information_retrieval",
+    "title": "Recuperación de Información y Búsqueda Vectorial",
+    "domain": "IR",
+    "n_sentences": 18,
+    "dp": {
+      "num_segments": 16,
+      "total_cost": 63678.0,
+      "avg_boundary_sim": 0.4533,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.3191,
+          "last_sentence": "La recuperación de información es la disciplina dedicada a encontrar documentos",
+          "first_sentence": "Los modelos clásicos basados en frecuencia de términos sentaron las bases matemá"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.3097,
+          "last_sentence": "Los modelos clásicos basados en frecuencia de términos sentaron las bases matemá",
+          "first_sentence": "TF-IDF pondera cada término según su frecuencia en el documento y su rareza en l"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 2,
+          "similarity": 0.4841,
+          "last_sentence": "TF-IDF pondera cada término según su frecuencia en el documento y su rareza en l",
+          "first_sentence": "BM25 extiende este esquema con dos mejoras significativas: la saturación del tér"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 3,
+          "similarity": 0.6375,
+          "last_sentence": "BM25 extiende este esquema con dos mejoras significativas: la saturación del tér",
+          "first_sentence": "A pesar de su simplicidad conceptual y su incapacidad para capturar similitud se"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 4,
+          "similarity": 0.4109,
+          "last_sentence": "A pesar de su simplicidad conceptual y su incapacidad para capturar similitud se",
+          "first_sentence": "Los sistemas de recuperación densa representan consultas y documentos como vecto"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 5,
+          "similarity": 0.6592,
+          "last_sentence": "Los sistemas de recuperación densa representan consultas y documentos como vecto",
+          "first_sentence": "Estos sistemas se entrenan mediante aprendizaje contrastivo para colocar pares c"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 6,
+          "similarity": 0.4878,
+          "last_sentence": "Estos sistemas se entrenan mediante aprendizaje contrastivo para colocar pares c",
+          "first_sentence": "Las arquitecturas bi-encoder codifican consultas y documentos de manera independ"
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 7,
+          "similarity": 0.7344,
+          "last_sentence": "Las arquitecturas bi-encoder codifican consultas y documentos de manera independ",
+          "first_sentence": "Las arquitecturas cross-encoder, en cambio, concatenan la consulta y el document"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 8,
+          "similarity": 0.2536,
+          "last_sentence": "Las arquitecturas cross-encoder, en cambio, concatenan la consulta y el document",
+          "first_sentence": "la recuperación sobre colecciones de gran escala."
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 10,
+          "similarity": 0.2828,
+          "last_sentence": "Un patrón arquitectónico habitual consiste en utilizar un bi-encoder para una pr",
+          "first_sentence": "Los sistemas de generación aumentada por recuperación combinan la memoria paramé"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 11,
+          "similarity": 0.6138,
+          "last_sentence": "Los sistemas de generación aumentada por recuperación combinan la memoria paramé",
+          "first_sentence": "Ante una consulta, el sistema recupera los pasajes más relevantes del índice y l"
+        },
+        {
+          "after_segment": 11,
+          "after_sentence_idx": 12,
+          "similarity": 0.6025,
+          "last_sentence": "Ante una consulta, el sistema recupera los pasajes más relevantes del índice y l",
+          "first_sentence": "Este diseño permite responder preguntas sobre dominios específicos o sobre infor"
+        },
+        {
+          "after_segment": 12,
+          "after_sentence_idx": 13,
+          "similarity": 0.4136,
+          "last_sentence": "Este diseño permite responder preguntas sobre dominios específicos o sobre infor",
+          "first_sentence": "Los algoritmos de búsqueda aproximada de vecinos más cercanos, como HNSW y los í"
+        },
+        {
+          "after_segment": 13,
+          "after_sentence_idx": 14,
+          "similarity": 0.5004,
+          "last_sentence": "Los algoritmos de búsqueda aproximada de vecinos más cercanos, como HNSW y los í",
+          "first_sentence": "Los sistemas híbridos que combinan puntuaciones de recuperación dispersa y densa"
+        },
+        {
+          "after_segment": 14,
+          "after_sentence_idx": 15,
+          "similarity": 0.0895,
+          "last_sentence": "Los sistemas híbridos que combinan puntuaciones de recuperación dispersa y densa",
+          "first_sentence": "aprovechando la complementariedad entre la precisión léxica de BM25 y"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 7,
+      "total_cost": 97765,
+      "avg_boundary_sim": 0.5353,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 2,
+          "similarity": 0.4841,
+          "last_sentence": "TF-IDF pondera cada término según su frecuencia en el documento y su rareza en l",
+          "first_sentence": "BM25 extiende este esquema con dos mejoras significativas: la saturación del tér"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 3,
+          "similarity": 0.6375,
+          "last_sentence": "BM25 extiende este esquema con dos mejoras significativas: la saturación del tér",
+          "first_sentence": "A pesar de su simplicidad conceptual y su incapacidad para capturar similitud se"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 5,
+          "similarity": 0.6592,
+          "last_sentence": "Los sistemas de recuperación densa representan consultas y documentos como vecto",
+          "first_sentence": "Estos sistemas se entrenan mediante aprendizaje contrastivo para colocar pares c"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 7,
+          "similarity": 0.7344,
+          "last_sentence": "Las arquitecturas bi-encoder codifican consultas y documentos de manera independ",
+          "first_sentence": "Las arquitecturas cross-encoder, en cambio, concatenan la consulta y el document"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 10,
+          "similarity": 0.2828,
+          "last_sentence": "Un patrón arquitectónico habitual consiste en utilizar un bi-encoder para una pr",
+          "first_sentence": "Los sistemas de generación aumentada por recuperación combinan la memoria paramé"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 13,
+          "similarity": 0.4136,
+          "last_sentence": "Este diseño permite responder preguntas sobre dominios específicos o sobre infor",
+          "first_sentence": "Los algoritmos de búsqueda aproximada de vecinos más cercanos, como HNSW y los í"
+        }
+      ]
+    },
+    "cost_reduction_pct": 34.87,
+    "boundary_quality_improvement": 0.082
+  },
+  {
+    "id": "software_engineering",
+    "title": "Prácticas de Ingeniería de Software",
+    "domain": "Software Engineering",
+    "n_sentences": 18,
+    "dp": {
+      "num_segments": 17,
+      "total_cost": 58567.0,
+      "avg_boundary_sim": 0.5177,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.6014,
+          "last_sentence": "La ingeniería de software es la aplicación disciplinada de principios de ingenie",
+          "first_sentence": "El campo surgió a finales de la década de 1960 como respuesta a la denominada cr"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.5865,
+          "last_sentence": "El campo surgió a finales de la década de 1960 como respuesta a la denominada cr",
+          "first_sentence": "La conferencia de la OTAN celebrada en Garmisch en 1968 formalizó el problema y"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 2,
+          "similarity": 0.412,
+          "last_sentence": "La conferencia de la OTAN celebrada en Garmisch en 1968 formalizó el problema y",
+          "first_sentence": "La programación estructurada introdujo el principio de utilizar únicamente estru"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 3,
+          "similarity": 0.582,
+          "last_sentence": "La programación estructurada introdujo el principio de utilizar únicamente estru",
+          "first_sentence": "La programación orientada a objetos organizó el código en torno a entidades que"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 4,
+          "similarity": 0.5892,
+          "last_sentence": "La programación orientada a objetos organizó el código en torno a entidades que",
+          "first_sentence": "Estos avances paradigmáticos transformaron profundamente la forma en que se conc"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 5,
+          "similarity": 0.6196,
+          "last_sentence": "Estos avances paradigmáticos transformaron profundamente la forma en que se conc",
+          "first_sentence": "El desarrollo de software moderno sigue metodologías iterativas como Scrum y Kan"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 6,
+          "similarity": 0.677,
+          "last_sentence": "El desarrollo de software moderno sigue metodologías iterativas como Scrum y Kan",
+          "first_sentence": "Scrum organiza el trabajo en iteraciones de duración fija denominadas sprints, c"
+        },
+        {
+          "after_segment": 7,
+          "after_sentence_idx": 7,
+          "similarity": 0.6244,
+          "last_sentence": "Scrum organiza el trabajo en iteraciones de duración fija denominadas sprints, c",
+          "first_sentence": "Reuniones diarias de sincronización permiten identificar impedimentos con rapide"
+        },
+        {
+          "after_segment": 8,
+          "after_sentence_idx": 8,
+          "similarity": 0.2435,
+          "last_sentence": "Reuniones diarias de sincronización permiten identificar impedimentos con rapide",
+          "first_sentence": "Kanban, por su parte, visualiza el flujo de trabajo en tableros que hacen explíc"
+        },
+        {
+          "after_segment": 9,
+          "after_sentence_idx": 9,
+          "similarity": 0.4076,
+          "last_sentence": "Kanban, por su parte, visualiza el flujo de trabajo en tableros que hacen explíc",
+          "first_sentence": "Ambas metodologías favorecen la colaboración cercana entre desarrolladores y par"
+        },
+        {
+          "after_segment": 10,
+          "after_sentence_idx": 10,
+          "similarity": 0.3869,
+          "last_sentence": "Ambas metodologías favorecen la colaboración cercana entre desarrolladores y par",
+          "first_sentence": "La integración continua automatiza la construcción y prueba del software con cad"
+        },
+        {
+          "after_segment": 11,
+          "after_sentence_idx": 11,
+          "similarity": 0.5104,
+          "last_sentence": "La integración continua automatiza la construcción y prueba del software con cad",
+          "first_sentence": "Los pipelines de entrega continua extienden esta automatización al proceso de de"
+        },
+        {
+          "after_segment": 12,
+          "after_sentence_idx": 12,
+          "similarity": 0.5126,
+          "last_sentence": "Los pipelines de entrega continua extienden esta automatización al proceso de de",
+          "first_sentence": "El desarrollo guiado por pruebas propugna escribir las pruebas automatizadas ant"
+        },
+        {
+          "after_segment": 13,
+          "after_sentence_idx": 13,
+          "similarity": 0.5176,
+          "last_sentence": "El desarrollo guiado por pruebas propugna escribir las pruebas automatizadas ant",
+          "first_sentence": "Las revisiones de código someten cada cambio al escrutinio de al menos un desarr"
+        },
+        {
+          "after_segment": 14,
+          "after_sentence_idx": 14,
+          "similarity": 0.5843,
+          "last_sentence": "Las revisiones de código someten cada cambio al escrutinio de al menos un desarr",
+          "first_sentence": "Las herramientas de análisis estático detectan potenciales errores, vulnerabilid"
+        },
+        {
+          "after_segment": 15,
+          "after_sentence_idx": 15,
+          "similarity": 0.4282,
+          "last_sentence": "Las herramientas de análisis estático detectan potenciales errores, vulnerabilid",
+          "first_sentence": "El perfilado de rendimiento identifica los cuellos de botella en programas en ej"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 7,
+      "total_cost": 101099,
+      "avg_boundary_sim": 0.5044,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 2,
+          "similarity": 0.412,
+          "last_sentence": "La conferencia de la OTAN celebrada en Garmisch en 1968 formalizó el problema y",
+          "first_sentence": "La programación estructurada introdujo el principio de utilizar únicamente estru"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 4,
+          "similarity": 0.5892,
+          "last_sentence": "La programación orientada a objetos organizó el código en torno a entidades que",
+          "first_sentence": "Estos avances paradigmáticos transformaron profundamente la forma en que se conc"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 6,
+          "similarity": 0.677,
+          "last_sentence": "El desarrollo de software moderno sigue metodologías iterativas como Scrum y Kan",
+          "first_sentence": "Scrum organiza el trabajo en iteraciones de duración fija denominadas sprints, c"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 9,
+          "similarity": 0.4076,
+          "last_sentence": "Kanban, por su parte, visualiza el flujo de trabajo en tableros que hacen explíc",
+          "first_sentence": "Ambas metodologías favorecen la colaboración cercana entre desarrolladores y par"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 12,
+          "similarity": 0.5126,
+          "last_sentence": "Los pipelines de entrega continua extienden esta automatización al proceso de de",
+          "first_sentence": "El desarrollo guiado por pruebas propugna escribir las pruebas automatizadas ant"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 15,
+          "similarity": 0.4282,
+          "last_sentence": "Las herramientas de análisis estático detectan potenciales errores, vulnerabilid",
+          "first_sentence": "El perfilado de rendimiento identifica los cuellos de botella en programas en ej"
+        }
+      ]
+    },
+    "cost_reduction_pct": 42.07,
+    "boundary_quality_improvement": -0.0133
+  },
+  {
+    "id": "optimization_methods",
+    "title": "Optimización por Descenso de Gradiente",
+    "domain": "Machine Learning",
+    "n_sentences": 8,
+    "dp": {
+      "num_segments": 8,
+      "total_cost": 23865.0,
+      "avg_boundary_sim": 0.5585,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 0,
+          "similarity": 0.5003,
+          "last_sentence": "El descenso de gradiente es el algoritmo de optimización central para el entrena",
+          "first_sentence": "De manera iterativa, actualiza los parámetros del modelo en la dirección del gra"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 1,
+          "similarity": 0.7624,
+          "last_sentence": "De manera iterativa, actualiza los parámetros del modelo en la dirección del gra",
+          "first_sentence": "El descenso de gradiente estocástico aproxima el gradiente verdadero utilizando"
+        },
+        {
+          "after_segment": 2,
+          "after_sentence_idx": 2,
+          "similarity": 0.5941,
+          "last_sentence": "El descenso de gradiente estocástico aproxima el gradiente verdadero utilizando",
+          "first_sentence": "Los métodos con momentum acumulan un vector de velocidad en las direcciones dond"
+        },
+        {
+          "after_segment": 3,
+          "after_sentence_idx": 3,
+          "similarity": 0.6354,
+          "last_sentence": "Los métodos con momentum acumulan un vector de velocidad en las direcciones dond",
+          "first_sentence": "El optimizador Adam combina el momentum con tasas de aprendizaje adaptativas por"
+        },
+        {
+          "after_segment": 4,
+          "after_sentence_idx": 4,
+          "similarity": 0.5768,
+          "last_sentence": "El optimizador Adam combina el momentum con tasas de aprendizaje adaptativas por",
+          "first_sentence": "Esta combinación lo convierte en el optimizador predeterminado en la mayoría de"
+        },
+        {
+          "after_segment": 5,
+          "after_sentence_idx": 5,
+          "similarity": 0.5188,
+          "last_sentence": "Esta combinación lo convierte en el optimizador predeterminado en la mayoría de",
+          "first_sentence": "Los esquemas de decaimiento de la tasa de aprendizaje reducen el tamaño del paso"
+        },
+        {
+          "after_segment": 6,
+          "after_sentence_idx": 6,
+          "similarity": 0.3217,
+          "last_sentence": "Los esquemas de decaimiento de la tasa de aprendizaje reducen el tamaño del paso",
+          "first_sentence": "El recorte de gradientes previene el problema de los gradientes explosivos en re"
+        }
+      ]
+    },
+    "baseline": {
+      "num_segments": 3,
+      "total_cost": 38993,
+      "avg_boundary_sim": 0.5565,
+      "boundaries": [
+        {
+          "after_segment": 0,
+          "after_sentence_idx": 2,
+          "similarity": 0.5941,
+          "last_sentence": "El descenso de gradiente estocástico aproxima el gradiente verdadero utilizando",
+          "first_sentence": "Los métodos con momentum acumulan un vector de velocidad en las direcciones dond"
+        },
+        {
+          "after_segment": 1,
+          "after_sentence_idx": 5,
+          "similarity": 0.5188,
+          "last_sentence": "Esta combinación lo convierte en el optimizador predeterminado en la mayoría de",
+          "first_sentence": "Los esquemas de decaimiento de la tasa de aprendizaje reducen el tamaño del paso"
+        }
+      ]
+    },
+    "cost_reduction_pct": 38.8,
+    "boundary_quality_improvement": -0.002
+  }
+]

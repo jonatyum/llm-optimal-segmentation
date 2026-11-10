@@ -2,6 +2,7 @@
 from src.segmentation.models import Segment, SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
+from src.segmentation.dp import _merge_to_limit
 
 
 def segment_baseline(
@@ -9,12 +10,15 @@ def segment_baseline(
     lmax: int = 200,
     model: str = "gpt-4o",
     lmin: int = 0,
+    max_sentences: int | None = None,
 ) -> SegmentationResult:
     sentences = split_sentences(text)
     if not sentences:
         raise ValueError("No sentences found in input text.")
 
     token_lens = count_tokens_batch(sentences, model=model)
+    if max_sentences is not None:
+        sentences, token_lens = _merge_to_limit(sentences, token_lens, max_sentences)
 
     segments = []
     current_sentences = []

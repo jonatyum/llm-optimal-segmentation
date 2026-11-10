@@ -9,7 +9,7 @@ from src.segmentation.metrics import (
     recompute_full_cost,
     compare_full_cost,
 )
-from src.segmentation.embeddings import segment_coherence, get_embeddings
+from src.segmentation.embeddings import segment_coherence, get_embeddings, clear_embedding_cache
 from src.segmentation.tokenizer import count_tokens, count_tokens_batch
 from src.segmentation.splitter import split_sentences
 from src.segmentation.evaluator import evaluate_segmentation, compare_evaluations
@@ -41,6 +41,7 @@ __all__ = [
     "compare_full_cost",
     "segment_coherence",
     "get_embeddings",
+    "clear_embedding_cache",
     "count_tokens",
     "count_tokens_batch",
     "split_sentences",

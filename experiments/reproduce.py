@@ -32,7 +32,7 @@ CANONICAL = dict(
     model="gpt-4o",
     coherence_lambda=0.5,
     mu=0.03,
-    fixed_cost=1000.0,
+    fixed_cost=2000.0,   # Cf=2000 validado empíricamente (15/20 textos con dev≤20%)
 )
 
 OUTPUT_JSON = os.path.join(ROOT, "outputs", "benchmark_results.json")
@@ -79,10 +79,27 @@ def run():
     if result.returncode != 0:
         sys.exit(result.returncode)
 
+    # Encadenar los scripts de análisis que dependen del benchmark
+    analysis_scripts = [
+        (["experiments/statistical_analysis.py"],          "Análisis estadístico"),
+        (["experiments/sensitivity_analysis.py",
+          "--n-texts", "10", "--max-sentences", "150"],    "Análisis de sensibilidad"),
+        (["experiments/complexity_analysis.py",
+          "--max-n", "200", "--reps", "3"],                 "Análisis de complejidad"),
+        (["experiments/case_studies.py", "--n-texts", "8"],"Casos de estudio"),
+        (["experiments/corpus_analysis.py"],               "Caracterización del corpus"),
+    ]
+    for args, label in analysis_scripts:
+        print(f"\n→ {label}...")
+        r = subprocess.run([sys.executable] + args, cwd=ROOT)
+        if r.returncode != 0:
+            print(f"  ⚠ {label} falló (continúa)")
+
     if os.path.exists(out_arg):
         with open(out_arg, encoding="utf-8") as f:
             data = json.load(f)
         agg = data["aggregates"]
+        stats = data.get("statistics", {})
         print("\n" + "=" * 60)
         print("Resultados agregados (para la tesis)")
         print("=" * 60)
@@ -91,6 +108,14 @@ def run():
         print(f"  Coherencia promedio DP:              {agg['avg_coherence_dp']:.4f}")
         print(f"  Coherencia promedio Baseline:        {agg['avg_coherence_baseline']:.4f}")
         print(f"  Mejora coherencia:                  +{agg['avg_coherence_dp'] - agg['avg_coherence_baseline']:.4f}")
+        if stats and "comparisons" in stats:
+            for c in stats["comparisons"]:
+                print(f"  {c['comparison']:<30} d={c['cohens_d']:.2f}  p={c['p_value']:.4f}")
+        print("=" * 60)
+        print("\nOutputs generados en outputs/:")
+        for f in sorted(os.listdir(os.path.join(ROOT, "outputs"))):
+            if f.endswith((".json", ".png")):
+                print(f"  {f}")
         print("=" * 60)
 
 

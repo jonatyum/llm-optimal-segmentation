@@ -1,0 +1,202 @@
+{
+  "parametros_canonicos": {
+    "lmin": 20,
+    "lmax": 150,
+    "overlap": 30,
+    "model": "gpt-4o",
+    "coherence_lambda": 0.5,
+    "overlap_mu": 0.03,
+    "fixed_cost": 2000.0
+  },
+  "corpus": {
+    "n_textos": 20,
+    "tokens_total": 12941,
+    "tokens_promedio": 647.0,
+    "tokens_min": 340,
+    "tokens_max": 1141,
+    "coherencia_promedio": 0.4423,
+    "dominios": [
+      "Algorithms",
+      "LLM",
+      "Geography",
+      "Law",
+      "Philosophy",
+      "Deep Learning",
+      "NLP",
+      "Economics",
+      "Software Engineering",
+      "Biology",
+      "Medicine",
+      "IR",
+      "Physics",
+      "Machine Learning",
+      "History"
+    ]
+  },
+  "benchmark": {
+    "n_textos": 20,
+    "reduccion_dp_vs_baseline_pct_nativa": 21.22,
+    "reduccion_dp_vs_sw_pct_nativa": 26.02,
+    "coherencia_dp": 0.8994,
+    "coherencia_baseline": 0.496,
+    "mejora_coherencia": 0.4034,
+    "pk_baseline_vs_dp_avg": 0.5685,
+    "pk_texttiling_vs_dp_avg": 0.5464,
+    "reduccion_min_pct": 4.57,
+    "reduccion_max_pct": 32.09
+  },
+  "estadisticas": [
+    {
+      "comparacion": "DP vs Baseline",
+      "n": 20,
+      "reduccion_media_pct": 43.8841,
+      "ic95": [
+        41.2197,
+        46.5485
+      ],
+      "t_stat": 17.373993,
+      "p_value": 0.0,
+      "p_fdr": 0.0,
+      "cohens_d": 3.8849,
+      "efecto": "grande",
+      "significativo": true
+    },
+    {
+      "comparacion": "DP vs Sliding Window",
+      "n": 20,
+      "reduccion_media_pct": 26.0167,
+      "ic95": [
+        21.6095,
+        30.424
+      ],
+      "t_stat": 9.247705,
+      "p_value": 0.0,
+      "p_fdr": 0.0,
+      "cohens_d": 2.0678,
+      "efecto": "grande",
+      "significativo": true
+    },
+    {
+      "comparacion": "DP vs DP+Overlap",
+      "n": 20,
+      "reduccion_media_pct": -0.304,
+      "ic95": [
+        -0.4864,
+        -0.1217
+      ],
+      "t_stat": -4.464962,
+      "p_value": 0.000265,
+      "p_fdr": 0.000265,
+      "cohens_d": -0.9984,
+      "efecto": "grande",
+      "significativo": true
+    },
+    {
+      "comparacion": "DP vs TextTiling",
+      "n": 20,
+      "reduccion_media_pct": 14.7333,
+      "ic95": [
+        11.9015,
+        17.565
+      ],
+      "t_stat": 8.202346,
+      "p_value": 0.0,
+      "p_fdr": 0.0,
+      "cohens_d": 1.8341,
+      "efecto": "grande",
+      "significativo": true
+    }
+  ],
+  "calibracion_k_star": {
+    "cf": 2000.0,
+    "valid_estricto_5pct": "3/20",
+    "valid_numerico_20pct": "15/20",
+    "desviacion_media": 0.1698,
+    "desviacion_std": 0.099
+  },
+  "sensibilidad": {
+    "lambda_values": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "cf_values": [
+      200.0,
+      500.0,
+      1000.0,
+      2000.0,
+      5000.0
+    ],
+    "k_star_min": 9.2,
+    "k_star_max": 13.7,
+    "k_star_variacion": 4.5,
+    "reduccion_min_pct": 12.0,
+    "reduccion_max_pct": 72.4,
+    "reduccion_variacion_pp": 60.3,
+    "mejor_combinacion": {
+      "lambda": 2.0,
+      "cf": 200.0,
+      "reduccion_pct": 72.4
+    },
+    "peor_combinacion": {
+      "lambda": 0.0,
+      "cf": 5000.0,
+      "reduccion_pct": 12.0
+    }
+  },
+  "complejidad": {
+    "n_medidos": [
+      10,
+      20,
+      30,
+      50,
+      75,
+      100,
+      150,
+      200
+    ],
+    "tiempos_dp_s": [
+      0.025841458002105355,
+      0.04044437495758757,
+      0.095831457991153,
+      0.1108034590142779,
+      0.1836732910014689,
+      0.2671399590326473,
+      0.31406750000314787,
+      0.3623105420265347
+    ],
+    "tiempos_baseline_s": [
+      0.016734792036004364,
+      0.029466708016116172,
+      0.056964042014442384,
+      0.07212183298543096,
+      0.1125397919677198,
+      0.2594645000062883,
+      0.2190763329854235,
+      0.28890887496527284
+    ],
+    "tiempos_texttiling_s": [
+      0.023340500018093735,
+      0.04102237505139783,
+      0.10484379198169336,
+      0.17059591598808765,
+      0.16118345799623057,
+      0.263317333010491,
+      0.2649424580158666,
+      0.3869964999612421
+    ],
+    "pendiente_log_log_dp": 0.93,
+    "pendiente_log_log_baseline": 1.0,
+    "pendiente_log_log_texttiling": 0.92,
+    "reps": 3
+  },
+  "casos_de_estudio": {
+    "n_textos": 8,
+    "sim_frontera_dp_avg": 0.4544,
+    "sim_frontera_baseline_avg": 0.4487,
+    "dp_mejora_fronteras_en": "3/8",
+    "reduccion_costo_avg": 41.02
+  }
+}

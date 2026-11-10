@@ -1,0 +1,527 @@
+{
+  "records": [
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 0,
+      "token_count": 40,
+      "token_count_sq": 1600,
+      "coherence": 1.0,
+      "predicted_cost": 2600.0,
+      "latency_ms": 2628.97
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 1,
+      "token_count": 39,
+      "token_count_sq": 1521,
+      "coherence": 1.0,
+      "predicted_cost": 2521.0,
+      "latency_ms": 697.63
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 2,
+      "token_count": 46,
+      "token_count_sq": 2116,
+      "coherence": 1.0,
+      "predicted_cost": 3116.0,
+      "latency_ms": 802.05
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 3,
+      "token_count": 48,
+      "token_count_sq": 2304,
+      "coherence": 1.0,
+      "predicted_cost": 3304.0,
+      "latency_ms": 739.3
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 4,
+      "token_count": 24,
+      "token_count_sq": 576,
+      "coherence": 1.0,
+      "predicted_cost": 1576.0,
+      "latency_ms": 409.25
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 5,
+      "token_count": 50,
+      "token_count_sq": 2500,
+      "coherence": 1.0,
+      "predicted_cost": 3500.0,
+      "latency_ms": 829.28
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 6,
+      "token_count": 38,
+      "token_count_sq": 1444,
+      "coherence": 0.2882,
+      "predicted_cost": 2957.95,
+      "latency_ms": 588.11
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 7,
+      "token_count": 58,
+      "token_count_sq": 3364,
+      "coherence": 1.0,
+      "predicted_cost": 4364.0,
+      "latency_ms": 749.94
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 8,
+      "token_count": 32,
+      "token_count_sq": 1024,
+      "coherence": 1.0,
+      "predicted_cost": 2024.0,
+      "latency_ms": 525.05
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 9,
+      "token_count": 35,
+      "token_count_sq": 1225,
+      "coherence": 1.0,
+      "predicted_cost": 2225.0,
+      "latency_ms": 594.86
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 10,
+      "token_count": 22,
+      "token_count_sq": 484,
+      "coherence": 1.0,
+      "predicted_cost": 1484.0,
+      "latency_ms": 367.55
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "dp",
+      "segment_idx": 11,
+      "token_count": 60,
+      "token_count_sq": 3600,
+      "coherence": 1.0,
+      "predicted_cost": 4600.0,
+      "latency_ms": 867.71
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "baseline",
+      "segment_idx": 0,
+      "token_count": 125,
+      "token_count_sq": 15625,
+      "coherence": 0.3318,
+      "predicted_cost": 21845.19,
+      "latency_ms": 853.46
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "baseline",
+      "segment_idx": 1,
+      "token_count": 122,
+      "token_count_sq": 14884,
+      "coherence": 0.2511,
+      "predicted_cost": 21457.06,
+      "latency_ms": 914.77
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "baseline",
+      "segment_idx": 2,
+      "token_count": 128,
+      "token_count_sq": 16384,
+      "coherence": 0.3077,
+      "predicted_cost": 23055.7,
+      "latency_ms": 849.54
+    },
+    {
+      "doc_id": "llm_inference",
+      "method": "baseline",
+      "segment_idx": 3,
+      "token_count": 117,
+      "token_count_sq": 13689,
+      "coherence": 0.5266,
+      "predicted_cost": 17929.02,
+      "latency_ms": 530.95
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 0,
+      "token_count": 36,
+      "token_count_sq": 1296,
+      "coherence": 1.0,
+      "predicted_cost": 2296.0,
+      "latency_ms": 464.59
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 1,
+      "token_count": 39,
+      "token_count_sq": 1521,
+      "coherence": 1.0,
+      "predicted_cost": 2521.0,
+      "latency_ms": 701.82
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 2,
+      "token_count": 29,
+      "token_count_sq": 841,
+      "coherence": 1.0,
+      "predicted_cost": 1841.0,
+      "latency_ms": 503.22
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 3,
+      "token_count": 68,
+      "token_count_sq": 4624,
+      "coherence": 1.0,
+      "predicted_cost": 5624.0,
+      "latency_ms": 690.02
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 4,
+      "token_count": 64,
+      "token_count_sq": 4096,
+      "coherence": 0.3854,
+      "predicted_cost": 6354.69,
+      "latency_ms": 1036.15
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 5,
+      "token_count": 45,
+      "token_count_sq": 2025,
+      "coherence": 1.0,
+      "predicted_cost": 3025.0,
+      "latency_ms": 610.41
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 6,
+      "token_count": 39,
+      "token_count_sq": 1521,
+      "coherence": 0.4403,
+      "predicted_cost": 2946.62,
+      "latency_ms": 404.83
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 7,
+      "token_count": 37,
+      "token_count_sq": 1369,
+      "coherence": 1.0,
+      "predicted_cost": 2369.0,
+      "latency_ms": 655.89
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 8,
+      "token_count": 20,
+      "token_count_sq": 400,
+      "coherence": 1.0,
+      "predicted_cost": 1400.0,
+      "latency_ms": 394.39
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 9,
+      "token_count": 25,
+      "token_count_sq": 625,
+      "coherence": 1.0,
+      "predicted_cost": 1625.0,
+      "latency_ms": 496.43
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 10,
+      "token_count": 61,
+      "token_count_sq": 3721,
+      "coherence": 1.0,
+      "predicted_cost": 4721.0,
+      "latency_ms": 732.51
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "dp",
+      "segment_idx": 11,
+      "token_count": 46,
+      "token_count_sq": 2116,
+      "coherence": 0.4826,
+      "predicted_cost": 3663.41,
+      "latency_ms": 699.76
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "baseline",
+      "segment_idx": 0,
+      "token_count": 104,
+      "token_count_sq": 10816,
+      "coherence": 0.5087,
+      "predicted_cost": 14472.69,
+      "latency_ms": 742.92
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "baseline",
+      "segment_idx": 1,
+      "token_count": 132,
+      "token_count_sq": 17424,
+      "coherence": 0.4102,
+      "predicted_cost": 23562.7,
+      "latency_ms": 839.88
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "baseline",
+      "segment_idx": 2,
+      "token_count": 141,
+      "token_count_sq": 19881,
+      "coherence": 0.469,
+      "predicted_cost": 26159.35,
+      "latency_ms": 697.65
+    },
+    {
+      "doc_id": "dynamic_programming",
+      "method": "baseline",
+      "segment_idx": 3,
+      "token_count": 132,
+      "token_count_sq": 17424,
+      "coherence": 0.4887,
+      "predicted_cost": 22878.37,
+      "latency_ms": 824.42
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 0,
+      "token_count": 32,
+      "token_count_sq": 1024,
+      "coherence": 1.0,
+      "predicted_cost": 2024.0,
+      "latency_ms": 516.62
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 1,
+      "token_count": 43,
+      "token_count_sq": 1849,
+      "coherence": 1.0,
+      "predicted_cost": 2849.0,
+      "latency_ms": 539.0
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 2,
+      "token_count": 50,
+      "token_count_sq": 2500,
+      "coherence": 0.3788,
+      "predicted_cost": 4276.52,
+      "latency_ms": 803.16
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 3,
+      "token_count": 63,
+      "token_count_sq": 3969,
+      "coherence": 1.0,
+      "predicted_cost": 4969.0,
+      "latency_ms": 709.7
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 4,
+      "token_count": 30,
+      "token_count_sq": 900,
+      "coherence": 1.0,
+      "predicted_cost": 1900.0,
+      "latency_ms": 312.29
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 5,
+      "token_count": 68,
+      "token_count_sq": 4624,
+      "coherence": 1.0,
+      "predicted_cost": 5624.0,
+      "latency_ms": 569.52
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 6,
+      "token_count": 44,
+      "token_count_sq": 1936,
+      "coherence": 1.0,
+      "predicted_cost": 2936.0,
+      "latency_ms": 693.79
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 7,
+      "token_count": 62,
+      "token_count_sq": 3844,
+      "coherence": 1.0,
+      "predicted_cost": 4844.0,
+      "latency_ms": 650.43
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 8,
+      "token_count": 31,
+      "token_count_sq": 961,
+      "coherence": 1.0,
+      "predicted_cost": 1961.0,
+      "latency_ms": 405.41
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 9,
+      "token_count": 33,
+      "token_count_sq": 1089,
+      "coherence": 1.0,
+      "predicted_cost": 2089.0,
+      "latency_ms": 495.58
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 10,
+      "token_count": 50,
+      "token_count_sq": 2500,
+      "coherence": 1.0,
+      "predicted_cost": 3500.0,
+      "latency_ms": 641.35
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 11,
+      "token_count": 49,
+      "token_count_sq": 2401,
+      "coherence": 1.0,
+      "predicted_cost": 3401.0,
+      "latency_ms": 692.16
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "dp",
+      "segment_idx": 12,
+      "token_count": 43,
+      "token_count_sq": 1849,
+      "coherence": 1.0,
+      "predicted_cost": 2849.0,
+      "latency_ms": 583.24
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "baseline",
+      "segment_idx": 0,
+      "token_count": 125,
+      "token_count_sq": 15625,
+      "coherence": 0.4933,
+      "predicted_cost": 20583.35,
+      "latency_ms": 872.54
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "baseline",
+      "segment_idx": 1,
+      "token_count": 93,
+      "token_count_sq": 8649,
+      "coherence": 0.6213,
+      "predicted_cost": 11286.84,
+      "latency_ms": 785.78
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "baseline",
+      "segment_idx": 2,
+      "token_count": 112,
+      "token_count_sq": 12544,
+      "coherence": 0.1445,
+      "predicted_cost": 18909.55,
+      "latency_ms": 975.26
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "baseline",
+      "segment_idx": 3,
+      "token_count": 126,
+      "token_count_sq": 15876,
+      "coherence": 0.5516,
+      "predicted_cost": 20435.31,
+      "latency_ms": 688.47
+    },
+    {
+      "doc_id": "semantic_coherence",
+      "method": "baseline",
+      "segment_idx": 4,
+      "token_count": 142,
+      "token_count_sq": 20164,
+      "coherence": 0.6023,
+      "predicted_cost": 25173.97,
+      "latency_ms": 882.87
+    }
+  ],
+  "stats": {
+    "n_segments": 50,
+    "latency_mean_ms": 705.21,
+    "latency_std_ms": 321.19,
+    "regression_t2_vs_latency": {
+      "slope": 0.011312,
+      "intercept": 643.14,
+      "r": 0.2157,
+      "r2": 0.0465,
+      "p_value": 0.132462,
+      "std_err": 0.007391,
+      "rmse_ms": 313.63
+    },
+    "regression_predicted_vs_latency": {
+      "slope": 0.008712,
+      "intercept": 638.36,
+      "r": 0.2171,
+      "r2": 0.0471,
+      "p_value": 0.129991,
+      "std_err": 0.005655,
+      "rmse_ms": 313.53
+    }
+  }
+}

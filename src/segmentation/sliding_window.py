@@ -1,8 +1,9 @@
 # sliding_window.py — ventana deslizante con overlap fijo
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from src.segmentation.models import SegmentationResult
 from src.segmentation.tokenizer import count_tokens_batch
 from src.segmentation.splitter import split_sentences
+from src.segmentation.dp import _merge_to_limit
 
 
 @dataclass
@@ -12,6 +13,7 @@ class SlidingWindowSegment:
     text: str
     token_count: int
     overlap_tokens: int
+    overlap_sentences: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -27,6 +29,7 @@ def segment_sliding_window(
     lmax: int = 200,
     overlap: int = 50,
     model: str = "gpt-4o",
+    max_sentences: int | None = None,
 ) -> SlidingWindowResult:
     if overlap >= lmax:
         raise ValueError(
@@ -38,6 +41,8 @@ def segment_sliding_window(
         raise ValueError("No sentences found in input text.")
 
     token_lens = count_tokens_batch(sentences, model=model)
+    if max_sentences is not None:
+        sentences, token_lens = _merge_to_limit(sentences, token_lens, max_sentences)
     n = len(sentences)
 
     segments = []
@@ -76,6 +81,7 @@ def segment_sliding_window(
             text=" ".join(current_sentences),
             token_count=current_tokens,
             overlap_tokens=overlap_tokens,
+            overlap_sentences=overlap_sentences,
         ))
 
         seg_index += 1
